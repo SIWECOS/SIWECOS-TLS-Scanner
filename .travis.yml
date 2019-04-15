@@ -6,40 +6,37 @@ cache:
 
 dist: trusty
 
-# Set env vars
-env:
-  global:
-    - GOOGLE_APPLICATION_CREDENTIALS=~/gcloud-service-key.json
-    - PROJECT_NAME_PRD=glowing-thunder-215513
-    - CLUSTER_NAME_PRD=siwecoscluster
-    - CLOUDSDK_COMPUTE_ZONE=europe-west1-b
-
-
-jobs:
-  include:
-    - stage: build docker image
-      script:
-      - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-      - docker build -t "$DOCKER_IMAGE" . --no-cache
-      - docker images
-      - docker tag "$DOCKER_IMAGE" "$DOCKER_REPO"/"$DOCKER_IMAGE":"$TRAVIS_BRANCH"
-      - docker push "$DOCKER_REPO"/"$DOCKER_IMAGE":"$TRAVIS_BRANCH"
+script:
+  - docker build -t ws-tls-scanner .
 
 before_deploy:
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
   - source /home/travis/google-cloud-sdk/path.bash.inc
   - gcloud --quiet version
   - gcloud --quiet components update
   - gcloud --quiet components update kubectl
+  - echo $GCLOUD_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
+  - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
+  - gcloud --quiet config set project $GOOGLE_PROJECT_NAME
+  - gcloud --quiet config set container/cluster $GOOGLE_CLUSTER_NAME
+  - gcloud --quiet config set compute/zone $GOOGLE_COMPUTE_ZONE
+  - gcloud --quiet container clusters get-credentials $GOOGLE_CLUSTER_NAME
 
 deploy:
   - provider: script
-    script: chmod +x deploy-master.sh && ./deploy-master.sh
-    skip_cleanup: true
-    on:
-      branch: master
-  - provider: script
-    script: chmod +x deploy-staging.sh && ./deploy-staging.sh
     skip_cleanup: true
     on:
       branch: develop
+    script: >-
+      docker tag ws-tls-scanner siwecos/ws-tls-scanner:develop &&
+      docker push siwecos/ws-tls-scanner:develop &&
+      kubectl patch deployment ws-tls-scanner --namespace staging -p '{"spec":{"template":{"metadata":{"labels":{"date":"`date +'%s'`", "commit":"$TRAVIS_COMMIT"}}}}}'
+  - provider: script
+    skip_cleanup: true
+    on:
+      branch: master
+    script: >-
+      docker tag ws-tls-scanner siwecos/ws-tls-scanner:latest &&
+      docker push siwecos/ws-tls-scanner:latest &&
+      kubectl patch deployment ws-tls-scanner --namespace production -p '{"spec":{"template":{"metadata":{"labels":{"date":"`date +'%s'`", "commit":"$TRAVIS_COMMIT"}}}}}'
