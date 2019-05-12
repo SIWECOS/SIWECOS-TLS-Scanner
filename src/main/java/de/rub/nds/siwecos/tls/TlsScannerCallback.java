@@ -11,6 +11,7 @@ package de.rub.nds.siwecos.tls;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.rub.nds.siwecos.tls.constants.ScanType;
 import de.rub.nds.siwecos.tls.json.CertificateTestInfo;
 import de.rub.nds.siwecos.tls.json.CiphersuitesTestInfo;
 import de.rub.nds.siwecos.tls.json.DateTestInfo;
@@ -24,9 +25,12 @@ import de.rub.nds.siwecos.tls.ws.DebugOutput;
 import de.rub.nds.siwecos.tls.ws.PoolManager;
 import de.rub.nds.siwecos.tls.ws.ScanRequest;
 import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
+import de.rub.nds.tlsattacker.core.config.delegate.Delegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
+import de.rub.nds.tlsattacker.core.config.delegate.StarttlsDelegate;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.HashAlgorithm;
+import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.workflow.NamedThreadFactory;
 import de.rub.nds.tlsattacker.core.workflow.ParallelExecutor;
 import de.rub.nds.tlsscanner.MultiThreadedScanJobExecutor;
@@ -60,6 +64,7 @@ import de.rub.nds.tlsscanner.report.after.Sweet32AfterProbe;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.Security;
@@ -84,9 +89,12 @@ public class TlsScannerCallback implements Runnable {
 
     private DebugOutput debugOutput;
 
-    public TlsScannerCallback(ScanRequest request, DebugOutput debugOutput) {
+    private ScanType type;
+
+    public TlsScannerCallback(ScanRequest request, ScanType type, DebugOutput debugOutput) {
         this.request = request;
         this.debugOutput = debugOutput;
+        this.type = type;
     }
 
     private String callbackUrlsToId(String[] urls) {
@@ -116,8 +124,39 @@ public class TlsScannerCallback implements Runnable {
             scannerConfig.setDangerLevel(request.getDangerLevel());
             scannerConfig.setScanDetail(ScannerDetail.QUICK);
             scannerConfig.setNoProgressbar(true);
+            int port = 443;
+            StarttlsDelegate starttlsDelegate = (StarttlsDelegate) scannerConfig.getDelegate(StarttlsDelegate.class);
+
+            switch (type) {
+                case HTTPS:
+                    port = 443;
+                    break;
+                case IMAP:
+                    starttlsDelegate.setStarttlsType(StarttlsType.IMAP);
+                    port = 143;
+                    break;
+                case IMAPS:
+                    port = 993;
+                    break;
+                case POP3:
+                    starttlsDelegate.setStarttlsType(StarttlsType.POP3);
+                    port = 110;
+                    break;
+                case POP3S:
+                    port = 995;
+                    break;
+                case SMTP:
+                    starttlsDelegate.setStarttlsType(StarttlsType.SMTP);
+                    port = 25;
+                    break;
+                case SMTPS:
+                    port = 465;
+                    break;
+            }
+
             ClientDelegate delegate = (ClientDelegate) scannerConfig.getDelegate(ClientDelegate.class);
-            delegate.setHost(request.getUrl().replace("https://", "").replace("http://", ""));
+            URI uri = new URI(request.getUrl());
+            delegate.setHost(uri.getHost());
             ParallelExecutor executor = new ParallelExecutor(PoolManager.getInstance().getParallelProbeThreads(), 3,
                     new NamedThreadFactory("" + id));
             List<TlsProbe> phaseOneList = new LinkedList<>();
@@ -135,8 +174,6 @@ public class TlsScannerCallback implements Runnable {
             phaseOneList.add(new Tls13Probe(scannerConfig, executor));
             // phaseOneList.add(new TokenbindingProbe(scannerConfig, executor));
             // phaseOneList.add(new HttpHeaderProbe(scannerConfig, executor));
-            phaseOneList.add(new CertificateProbe(scannerConfig, executor));
-
             // phaseTwoList.add(new ResumptionProbe(scannerConfig, executor));
             // phaseTwoList.add(new RenegotiationProbe(scannerConfig,
             // executor));
