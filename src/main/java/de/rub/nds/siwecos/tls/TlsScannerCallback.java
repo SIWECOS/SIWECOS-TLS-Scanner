@@ -25,7 +25,6 @@ import de.rub.nds.siwecos.tls.ws.DebugOutput;
 import de.rub.nds.siwecos.tls.ws.PoolManager;
 import de.rub.nds.siwecos.tls.ws.ScanRequest;
 import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
-import de.rub.nds.tlsattacker.core.config.delegate.Delegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.StarttlsDelegate;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
