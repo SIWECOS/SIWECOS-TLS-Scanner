@@ -1,5 +1,5 @@
 # WS-TLS-Scanner
-WS-TLS-Scanner is a Webservice created by the Chair for Network and Data Security from the Ruhr-University Bochum for the integration of the [TLS-Scanner](https://github.com/RUB-NDS/TLS-Scanner) in the SIWECOS Project. The Webservice scans a provided URL for various TLS misconfigurations and responds with a JSON report.
+WS-TLS-Scanner is a Webservice created by the Chair for Network and Data Security from the Ruhr-University Bochum for the integration of the [TLS-Scanner](https://github.com/RUB-NDS/TLS-Scanner) in the SIWECOS Project. The Webservice scans a provided URL for various TLS misconfigurations and responds with a JSON report in either HTTPS, IMAP (STARTTLS), POP3 (STARTTLS), SMTP (STARTTLS), POP3S, IMAPS or SMTPS.
 
 # Compiling
 In order to compile and use WS-TLS-Scanner, you need to have Java installed, as well as [TLS-Attacker](https://github.com/RUB-NDS/TLS-Attacker), [ModifiableVariables](https://github.com/RUB-NDS/ModifiableVariable) and the [TLS-Scanner](https://github.com/RUB-NDS/TLS-Scanner)
@@ -12,7 +12,7 @@ $ mvn clean package
 
 For hints on installing the required libraries checkout the corresponding GitHub repositories.
 
-**Please note:**  *In order to run this tool you need TLS-Attacker 2.6*
+**Please note:**  *In order to run this tool you need TLS-Attacker 2.9*
 
 # Running
 In order to run WS-TLS-Scanner you need to deploy the .war file from the target/ folder to your favourite java application server (eg. Glassfish, Tomcat ...). After that the webservice should be up and running and can be called by sending a POST like
@@ -25,15 +25,30 @@ In order to run WS-TLS-Scanner you need to deploy the .war file from the target/
   ]
 }
 ```
-to
+to either
 ```
-http://127.0.0.1:8080/WS-TLS-Scanner-2.4/start
+http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/https
+http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/pop3
+http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/pop3s
+http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/imap
+http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/imaps
+http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/smtp
+http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/smtps
+
 ```
 
 or 
 
 ```
-http://127.0.0.1:8080/start
+http://127.0.0.1:8080/https
+http://127.0.0.1:8080/pop3
+http://127.0.0.1:8080/pop3s
+http://127.0.0.1:8080/imap
+http://127.0.0.1:8080/imaps
+http://127.0.0.1:8080/smtp
+http://127.0.0.1:8080/smtps
+
+
 ```
 Depending on your application server.
 
@@ -288,5 +303,11 @@ docker run -it --network host tls-scanner
 ```
 The webservice is then reachable under:
 ```
-http://127.0.0.1:8080/start
+http://127.0.0.1:8080/https
+http://127.0.0.1:8080/pop3
+http://127.0.0.1:8080/pop3s
+http://127.0.0.1:8080/imap
+http://127.0.0.1:8080/imaps
+http://127.0.0.1:8080/smtp
+http://127.0.0.1:8080/smtps
 ```
