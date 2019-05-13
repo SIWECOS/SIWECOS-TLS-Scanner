@@ -59,19 +59,19 @@ An example output may look like this:
 ```json
 
 {
-  "name" : "TLS",
+  "name" : "HTTPS",
   "hasError" : false,
   "errorMessage" : null,
   "score" : 0,
   "tests" : [ {
-    "name" : "HTTPS_NO_RESPONSE",
+    "name" : "PORT_NO_RESPONSE",
     "hasError" : false,
     "errorMessage" : null,
     "score" : 100,
     "scoreType" : "success",
     "testDetails" : null
   }, {
-    "name" : "HTTPS_NOT_SUPPORTED",
+    "name" : "TLS_NOT_SUPPORTED",
     "hasError" : false,
     "errorMessage" : null,
     "score" : 100,

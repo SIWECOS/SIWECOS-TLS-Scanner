@@ -155,7 +155,8 @@ public class TlsScannerCallback implements Runnable {
 
             ClientDelegate delegate = (ClientDelegate) scannerConfig.getDelegate(ClientDelegate.class);
             URI uri = new URI(request.getUrl());
-            delegate.setHost(uri.getHost());
+            delegate.setHost(uri.getHost() + ":" + port);
+            LOGGER.debug("Scanning: " + uri.getHost() + ":" + port);
             ParallelExecutor executor = new ParallelExecutor(PoolManager.getInstance().getParallelProbeThreads(), 3,
                     new NamedThreadFactory("" + id));
             List<TlsProbe> phaseOneList = new LinkedList<>();
@@ -196,7 +197,7 @@ public class TlsScannerCallback implements Runnable {
             SiteReport report = scanner.scan();
             executor.shutdown();
             scanJobExecutor.shutdown();
-            ScanResult result = reportToScanResult(report);
+            ScanResult result = reportToScanResult(report, type);
             LOGGER.info("Finished scanning: " + request.getUrl());
             debugOutput.setScanFinisedAt(System.currentTimeMillis());
             debugOutput.setFinalQueueSize(PoolManager.getInstance().getService().getQueue().size());
@@ -249,12 +250,16 @@ public class TlsScannerCallback implements Runnable {
         }
     }
 
-    public ScanResult reportToScanResult(SiteReport report) {
+    public ScanResult reportToScanResult(SiteReport report, ScanType type) {
         if (!Objects.equals(report.getServerIsAlive(), Boolean.TRUE)) {
-            return new ScanResult("TLS", true, getHttpsResponse(report), 0, new LinkedList<TestResult>());
+            if (type == ScanType.HTTPS) {
+                return new ScanResult(type.name(), true, getPortResponse(report), 0, new LinkedList<TestResult>());
+            } else {
+                return new ScanResult(type.name(), true, getPortResponse(report), 100, new LinkedList<TestResult>());
+            }
         }
         if (!Objects.equals(report.getSupportsSslTls(), Boolean.TRUE)) {
-            return new ScanResult("TLS", true, getHttpsSupported(report), 0, new LinkedList<TestResult>());
+            return new ScanResult(type.name(), true, getTlsSupported(report), 0, new LinkedList<TestResult>());
         }
         List<TestResult> resultList = new LinkedList<>();
         if (report.getProbeTypeList().contains(ProbeType.CERTIFICATE)) {
@@ -349,13 +354,13 @@ public class TlsScannerCallback implements Runnable {
         return result;
     }
 
-    private TranslateableMessage getHttpsResponse(SiteReport report) {
-        return new TranslateableMessage("HTTPS_RESPONSE", new HostTestInfo(report.getHost()));
+    private TranslateableMessage getPortResponse(SiteReport report) {
+        return new TranslateableMessage("PORT_NO_RESPONSE", new HostTestInfo(report.getHost()));
 
     }
 
-    private TranslateableMessage getHttpsSupported(SiteReport report) {
-        return new TranslateableMessage("HTTPS_SUPPORTED", new HostTestInfo(report.getHost()));
+    private TranslateableMessage getTlsSupported(SiteReport report) {
+        return new TranslateableMessage("TLS_NOT_SUPPORTED", new HostTestInfo(report.getHost()));
     }
 
     private TestResult getCertificateExpired(SiteReport report) {
@@ -379,7 +384,7 @@ public class TlsScannerCallback implements Runnable {
         }
         return new TestResult("CERTIFICATE_EXPIRED", report.getCertificateExpired() == null, null,
                 report.getCertificateExpired() ? 0 : 100, !report.getCertificateExpired() == Boolean.TRUE ? "success"
-                        : "critical", messageList);
+                : "critical", messageList);
     }
 
     private TestResult getCertificateNotValidYet(SiteReport report) {
