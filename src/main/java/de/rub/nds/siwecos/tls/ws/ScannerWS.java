@@ -87,7 +87,7 @@ public class ScannerWS {
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, POP3S, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, POP3, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
