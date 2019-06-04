@@ -367,7 +367,7 @@ public class TlsScannerCallback implements Runnable {
         List<TranslateableMessage> messageList = new LinkedList<>();
         Date tempDate = null;
         String certString = null;
-        for (CertificateReport certReport : report.getCertificateReports()) {
+        for (CertificateReport certReport : report.getCertificateChain().getCertificateReportList()) {
             if (certReport.getValidTo().before(new Date(System.currentTimeMillis()))) {
                 tempDate = certReport.getValidTo();
                 certString = certReport.toString();
@@ -384,14 +384,14 @@ public class TlsScannerCallback implements Runnable {
         }
         return new TestResult("CERTIFICATE_EXPIRED", report.getCertificateExpired() == null, null,
                 report.getCertificateExpired() ? 0 : 100, !report.getCertificateExpired() == Boolean.TRUE ? "success"
-                : "critical", messageList);
+                        : "critical", messageList);
     }
 
     private TestResult getCertificateNotValidYet(SiteReport report) {
         List<TranslateableMessage> messageList = new LinkedList<>();
         Date tempDate = null;
         String certString = null;
-        for (CertificateReport certReport : report.getCertificateReports()) {
+        for (CertificateReport certReport : report.getCertificateChain().getCertificateReportList()) {
             if (certReport.getValidFrom().after(new Date(System.currentTimeMillis()))) {
                 tempDate = certReport.getValidFrom();
                 certString = certReport.toString();
@@ -427,7 +427,7 @@ public class TlsScannerCallback implements Runnable {
         String hashAlgo = null;
         List<TranslateableMessage> messageList = new LinkedList<>();
         if (report.getCertificateHasWeakHashAlgorithm() != null) {
-            for (CertificateReport certReport : report.getCertificateReports()) {
+            for (CertificateReport certReport : report.getCertificateChain().getCertificateReportList()) {
                 if (certReport.getSignatureAndHashAlgorithm().getHashAlgorithm() == HashAlgorithm.MD5
                         || certReport.getSignatureAndHashAlgorithm().getHashAlgorithm() == HashAlgorithm.SHA1) {
                     hashAlgo = certReport.getSignatureAndHashAlgorithm().getHashAlgorithm().name();
