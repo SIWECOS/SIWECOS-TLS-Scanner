@@ -86,9 +86,9 @@ public class TlsScannerCallback implements Runnable {
 
     private final ScanRequest request;
 
-    private DebugOutput debugOutput;
+    private final DebugOutput debugOutput;
 
-    private ScanType type;
+    private final ScanType type;
 
     public TlsScannerCallback(ScanRequest request, ScanType type, DebugOutput debugOutput) {
         this.request = request;
@@ -477,8 +477,8 @@ public class TlsScannerCallback implements Runnable {
             messageList = null;
         }
         return new TestResult("CIPHERSUITE_ANON", report.getSupportsAnonCiphers() == null, null,
-                report.getSupportsAnonCiphers() == Boolean.TRUE ? 0 : 100,
-                !(report.getSupportsAnonCiphers() == Boolean.TRUE) ? "success" : "fatal", messageList);
+                Objects.equals(report.getSupportsAnonCiphers(), Boolean.TRUE) ? 0 : 100,
+                !(Objects.equals(report.getSupportsAnonCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
     }
 
     private TestInfo convertSuiteList(List<CipherSuite> suiteList) {
@@ -503,8 +503,8 @@ public class TlsScannerCallback implements Runnable {
             messageList = null;
         }
         return new TestResult("CIPHERSUITE_EXPORT", report.getSupportsExportCiphers() == null, null,
-                report.getSupportsExportCiphers() == Boolean.TRUE ? 0 : 100,
-                !(report.getSupportsExportCiphers() == Boolean.TRUE) ? "success" : "fatal", messageList);
+                Objects.equals(report.getSupportsExportCiphers(), Boolean.TRUE) ? 0 : 100,
+                !(Objects.equals(report.getSupportsExportCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
     }
 
     private TestResult getSupportsNull(SiteReport report) {
