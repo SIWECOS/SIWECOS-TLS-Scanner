@@ -476,9 +476,9 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CIPHERSUITE_ANON", report.getSupportsAnonCiphers() == null, null,
-                Objects.equals(report.getSupportsAnonCiphers(), Boolean.TRUE) ? 0 : 100,
-                !(Objects.equals(report.getSupportsAnonCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
+        return new TestResult("CIPHERSUITE_ANON", report.getSupportsAnonCiphers() == null, null, Objects.equals(
+                report.getSupportsAnonCiphers(), Boolean.TRUE) ? 0 : 100, !(Objects.equals(
+                report.getSupportsAnonCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
     }
 
     private TestInfo convertSuiteList(List<CipherSuite> suiteList) {
@@ -502,9 +502,9 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CIPHERSUITE_EXPORT", report.getSupportsExportCiphers() == null, null,
-                Objects.equals(report.getSupportsExportCiphers(), Boolean.TRUE) ? 0 : 100,
-                !(Objects.equals(report.getSupportsExportCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
+        return new TestResult("CIPHERSUITE_EXPORT", report.getSupportsExportCiphers() == null, null, Objects.equals(
+                report.getSupportsExportCiphers(), Boolean.TRUE) ? 0 : 100, !(Objects.equals(
+                report.getSupportsExportCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
     }
 
     private TestResult getSupportsNull(SiteReport report) {
