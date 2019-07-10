@@ -18,34 +18,34 @@ import java.util.List;
  */
 public class TranslateableMessage {
 
-    private String placeholder;
+    private String translationStringId;
 
-    private List<TestInfo> values;
+    private List<TestInfo> placeholders;
 
-    public TranslateableMessage(String placeholder, List<TestInfo> values) {
-        this.placeholder = placeholder;
-        this.values = values;
+    public TranslateableMessage(String transladtionStringId, List<TestInfo> placeholders) {
+        this.translationStringId = transladtionStringId;
+        this.placeholders = placeholders;
     }
 
-    public TranslateableMessage(String placeholder, TestInfo value) {
-        this.placeholder = placeholder;
-        this.values = new LinkedList<>();
-        values.add(value);
+    public TranslateableMessage(String translationStringId, TestInfo placeholder) {
+        this.translationStringId = translationStringId;
+        this.placeholders = new LinkedList<>();
+        placeholders.add(placeholder);
     }
 
-    public String getPlaceholder() {
-        return placeholder;
+    public String getTranslationStringId() {
+        return translationStringId;
     }
 
-    public void setPlaceholder(String placeholder) {
-        this.placeholder = placeholder;
+    public void setTranslationStringId(String translationStringId) {
+        this.translationStringId = translationStringId;
     }
 
-    public List<TestInfo> getValues() {
-        return values;
+    public List<TestInfo> getPlaceholders() {
+        return placeholders;
     }
 
-    public void setValues(List<TestInfo> values) {
-        this.values = values;
+    public void setPlaceholders(List<TestInfo> placeholders) {
+        this.placeholders = placeholders;
     }
 }

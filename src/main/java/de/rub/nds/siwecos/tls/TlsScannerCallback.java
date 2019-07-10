@@ -86,9 +86,9 @@ public class TlsScannerCallback implements Runnable {
 
     private final ScanRequest request;
 
-    private DebugOutput debugOutput;
+    private final DebugOutput debugOutput;
 
-    private ScanType type;
+    private final ScanType type;
 
     public TlsScannerCallback(ScanRequest request, ScanType type, DebugOutput debugOutput) {
         this.request = request;
@@ -367,7 +367,7 @@ public class TlsScannerCallback implements Runnable {
         List<TranslateableMessage> messageList = new LinkedList<>();
         Date tempDate = null;
         String certString = null;
-        for (CertificateReport certReport : report.getCertificateReports()) {
+        for (CertificateReport certReport : report.getCertificateChain().getCertificateReportList()) {
             if (certReport.getValidTo().before(new Date(System.currentTimeMillis()))) {
                 tempDate = certReport.getValidTo();
                 certString = certReport.toString();
@@ -384,14 +384,14 @@ public class TlsScannerCallback implements Runnable {
         }
         return new TestResult("CERTIFICATE_EXPIRED", report.getCertificateExpired() == null, null,
                 report.getCertificateExpired() ? 0 : 100, !report.getCertificateExpired() == Boolean.TRUE ? "success"
-                : "critical", messageList);
+                        : "critical", messageList);
     }
 
     private TestResult getCertificateNotValidYet(SiteReport report) {
         List<TranslateableMessage> messageList = new LinkedList<>();
         Date tempDate = null;
         String certString = null;
-        for (CertificateReport certReport : report.getCertificateReports()) {
+        for (CertificateReport certReport : report.getCertificateChain().getCertificateReportList()) {
             if (certReport.getValidFrom().after(new Date(System.currentTimeMillis()))) {
                 tempDate = certReport.getValidFrom();
                 certString = certReport.toString();
@@ -427,7 +427,7 @@ public class TlsScannerCallback implements Runnable {
         String hashAlgo = null;
         List<TranslateableMessage> messageList = new LinkedList<>();
         if (report.getCertificateHasWeakHashAlgorithm() != null) {
-            for (CertificateReport certReport : report.getCertificateReports()) {
+            for (CertificateReport certReport : report.getCertificateChain().getCertificateReportList()) {
                 if (certReport.getSignatureAndHashAlgorithm().getHashAlgorithm() == HashAlgorithm.MD5
                         || certReport.getSignatureAndHashAlgorithm().getHashAlgorithm() == HashAlgorithm.SHA1) {
                     hashAlgo = certReport.getSignatureAndHashAlgorithm().getHashAlgorithm().name();
@@ -476,9 +476,9 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CIPHERSUITE_ANON", report.getSupportsAnonCiphers() == null, null,
-                report.getSupportsAnonCiphers() == Boolean.TRUE ? 0 : 100,
-                !(report.getSupportsAnonCiphers() == Boolean.TRUE) ? "success" : "fatal", messageList);
+        return new TestResult("CIPHERSUITE_ANON", report.getSupportsAnonCiphers() == null, null, Objects.equals(
+                report.getSupportsAnonCiphers(), Boolean.TRUE) ? 0 : 100, !(Objects.equals(
+                report.getSupportsAnonCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
     }
 
     private TestInfo convertSuiteList(List<CipherSuite> suiteList) {
@@ -502,9 +502,9 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CIPHERSUITE_EXPORT", report.getSupportsExportCiphers() == null, null,
-                report.getSupportsExportCiphers() == Boolean.TRUE ? 0 : 100,
-                !(report.getSupportsExportCiphers() == Boolean.TRUE) ? "success" : "fatal", messageList);
+        return new TestResult("CIPHERSUITE_EXPORT", report.getSupportsExportCiphers() == null, null, Objects.equals(
+                report.getSupportsExportCiphers(), Boolean.TRUE) ? 0 : 100, !(Objects.equals(
+                report.getSupportsExportCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
     }
 
     private TestResult getSupportsNull(SiteReport report) {

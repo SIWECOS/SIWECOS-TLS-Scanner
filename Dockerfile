@@ -11,8 +11,8 @@ RUN apt update \
     && dpkg -l | grep libgnutls \
     && rm -r /var/lib/apt/lists/*
 
-RUN git clone --branch 2.9 https://github.com/RUB-NDS/TLS-Attacker.git \
-    && git clone --branch 2.7 https://github.com/RUB-NDS/TLS-Scanner.git
+RUN git clone --branch 3.0 https://github.com/RUB-NDS/TLS-Attacker.git \
+    && git clone --branch 2.8 https://github.com/RUB-NDS/TLS-Scanner.git
 
 RUN cd /src/TLS-Attacker && mvn clean install -DskipTests=true \
     && cd /src/TLS-Scanner && mvn clean install -DskipTests=true 

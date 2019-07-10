@@ -1,3 +1,12 @@
+/**
+ *  SIWECOS-TLS-Scanner - A Webservice for the TLS-Scanner Module of TLS-Attacker
+ *
+ *  Copyright 2014-2017 Ruhr University Bochum / Hackmanit GmbH
+ *
+ *  Licensed under Apache License 2.0
+ *  http://www.apache.org/licenses/LICENSE-2.0
+ *
+ */
 /*
  */
 package de.rub.nds.siwecos.tls;
@@ -16,6 +25,7 @@ import de.rub.nds.tlsattacker.core.https.header.HttpsHeader;
 import de.rub.nds.tlsscanner.constants.CheckPatternType;
 import de.rub.nds.tlsscanner.constants.GcmPattern;
 import de.rub.nds.tlsscanner.constants.ProbeType;
+import de.rub.nds.tlsscanner.probe.certificate.CertificateChain;
 import de.rub.nds.tlsscanner.probe.certificate.CertificateReport;
 import de.rub.nds.tlsscanner.probe.mac.ByteCheckStatus;
 import de.rub.nds.tlsscanner.probe.mac.CheckPattern;
@@ -29,7 +39,6 @@ import de.rub.nds.tlsscanner.report.result.bleichenbacher.BleichenbacherTestResu
 import de.rub.nds.tlsscanner.report.result.hpkp.HpkpPin;
 import de.rub.nds.tlsscanner.report.result.paddingoracle.PaddingOracleCipherSuiteFingerprint;
 import de.rub.nds.tlsscanner.report.result.statistics.RandomEvaluationResult;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +48,6 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -77,11 +85,11 @@ public class TlsScannerCallbackTest {
             probeList.add(type);
         }
         SiteReport report = new SiteReport("somehost.de", probeList, false);
-        
+
         report.setServerIsAlive(Boolean.TRUE);
         report.setSpeaksHttps(Boolean.TRUE);
         report.setSupportsSslTls(Boolean.TRUE);
-        
+
         report.setAlpnIntolerance(Boolean.TRUE);
         report.setBleichenbacherTestResultList(new LinkedList<BleichenbacherTestResult>());
         report.setBleichenbacherVulnerable(Boolean.TRUE);
@@ -94,7 +102,7 @@ public class TlsScannerCallbackTest {
         report.setCertificateKeyIsBlacklisted(true);
         report.setCertificateMachtesDomainName(true);
         report.setCertificateNotYetValid(true);
-        report.setCertificateReports(new LinkedList<CertificateReport>());
+        report.setCertificateChain(new CertificateChain(Certificate.EMPTY_CHAIN, "somehost.de"));
         report.setCipherSuiteIntolerance(Boolean.TRUE);
         report.setCipherSuiteLengthIntolerance512(Boolean.TRUE);
         HashSet<CipherSuite> cipherSuiteSet = new HashSet<>();
@@ -121,13 +129,15 @@ public class TlsScannerCallbackTest {
         report.setHeaderList(new LinkedList<HttpsHeader>());
         report.setHeartbleedVulnerable(Boolean.TRUE);
         report.setHpkpMaxAge(15);
-        report.setHstsMaxAge(16);
+        report.setHstsMaxAge(16l);
         report.setIgnoresCipherSuiteOffering(true);
         report.setIgnoresOfferedNamedGroups(Boolean.TRUE);
         report.setIgnoresOfferedSignatureAndHashAlgorithms(Boolean.TRUE);
         report.setInvalidCurveEphermaralVulnerable(Boolean.TRUE);
         report.setInvalidCurveVulnerable(true);
-        report.setKnownVulnerability(new KnownPaddingOracleVulnerability("cve", "name", "longname", PaddingOracleStrength.STRONG, true, new LinkedList<CipherSuite>(), new LinkedList<CipherSuite>(), "", new LinkedList<String>(), new LinkedList<IdentifierResponse>(), true));
+        report.setKnownVulnerability(new KnownPaddingOracleVulnerability("cve", "name", "longname",
+                PaddingOracleStrength.STRONG, true, new LinkedList<CipherSuite>(), new LinkedList<CipherSuite>(), "",
+                new LinkedList<String>(), new LinkedList<IdentifierResponse>(), true));
         report.setLogjamVulnerable(true);
         report.setMacCheckPatterAppData(new CheckPattern(CheckPatternType.NONE, true, new ByteCheckStatus[1]));
         report.setMacCheckPatternFinished(new CheckPattern(CheckPatternType.NONE, true, new ByteCheckStatus[1]));
@@ -146,10 +156,10 @@ public class TlsScannerCallbackTest {
         report.setReflectsCipherSuiteOffering(true);
         report.setReportOnlyHpkpPins(new LinkedList<HpkpPin>());
         report.setRequiresSni(true);
-        
+
         report.setSessionTicketGetsRotated(false);
         report.setSessionTicketLengthHint(1l);
-        
+
         report.setSupportedCompressionMethods(new LinkedList<CompressionMethod>());
         report.setSupportedExtensions(new LinkedList<ExtensionType>());
         report.setSupportedNamedGroups(new LinkedList<NamedGroup>());
