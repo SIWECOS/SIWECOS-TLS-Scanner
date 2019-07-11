@@ -12,7 +12,7 @@ $ mvn clean package
 
 For hints on installing the required libraries checkout the corresponding GitHub repositories.
 
-**Please note:**  *In order to run this tool you need TLS-Attacker 2.9*
+**Please note:**  *In order to run this tool you need TLS-Attacker 3.0*
 
 # Running
 In order to run WS-TLS-Scanner you need to deploy the .war file from the target/ folder to your favourite java application server (eg. Glassfish, Tomcat ...). After that the webservice should be up and running and can be called by sending a POST like
@@ -310,4 +310,10 @@ http://127.0.0.1:8080/imap
 http://127.0.0.1:8080/imaps
 http://127.0.0.1:8080/smtp
 http://127.0.0.1:8080/smtps
+```
+# Redis
+You can also make WS-TLS-Scanner use Redis to store its tasks. Just set the following enviroment variables: 
+```
+REDIS_HOST=<NODE ADDRESS HERE>
+REDIS_DB=<DATABSE HERE>
 ```

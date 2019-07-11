@@ -14,16 +14,17 @@
  */
 package de.rub.nds.siwecos.tls.ws;
 
-import static de.rub.nds.siwecos.tls.ws.ScannerWS.LOGGER;
 import de.rub.nds.tlsattacker.core.workflow.NamedThreadFactory;
-import de.rub.nds.tlsattacker.core.workflow.ParallelExecutor;
-import de.rub.nds.tlsscanner.ScanJobExecutor;
 import java.security.Security;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import org.apache.logging.log4j.LogManager;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 
 /**
  *
@@ -40,11 +41,34 @@ public class PoolManager {
     private int probeThreads = 9;
 
     private PoolManager() {
+        LOGGER.info("Initializing PoolManager...");
         LOGGER.info("Adding BC as a Security Provider");
         Security.addProvider(new BouncyCastleProvider());
         LOGGER.info("Starting thread pool");
-        service = new ThreadPoolExecutor(10, 10, 10, TimeUnit.MINUTES, new LinkedBlockingDeque<Runnable>(),
-                new NamedThreadFactory("Worker"));
+
+        String redisHost = System.getenv("REDIS_HOST");
+        String redisDb = System.getenv("REDIS_DB");
+        BlockingQueue<Runnable> blockingQueue;
+
+        if (redisHost == null || redisDb == null) {
+            LOGGER.error("Could not find REDIS server, falling back to local queue");
+            blockingQueue = new LinkedBlockingDeque<>();
+        } else {
+            LOGGER.info("Initializing connection to redis:" + redisHost + "/" + redisDb);
+            Config config = new Config();
+            config.useClusterServers().addNodeAddress(redisHost);
+            try {
+                RedissonClient redisson = Redisson.create();
+                blockingQueue = redisson.getBlockingDeque(redisDb);
+                System.out.println("Established connection to redis :)");
+            } catch (Exception E) {
+                LOGGER.error("Connection to redis failed", E);
+                LOGGER.error("Falling back to normal queue");
+                blockingQueue = new LinkedBlockingDeque<>();
+            }
+        }
+        service = new ThreadPoolExecutor(10, 10, 10, TimeUnit.MINUTES, blockingQueue, new NamedThreadFactory("Worker"));
+        LOGGER.info("PoolManager Inialized successfully");
     }
 
     public static PoolManager getInstance() {

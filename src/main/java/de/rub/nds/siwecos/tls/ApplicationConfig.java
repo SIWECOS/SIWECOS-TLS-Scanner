@@ -12,14 +12,10 @@ package de.rub.nds.siwecos.tls;
 import de.rub.nds.siwecos.tls.ws.PoolManager;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 
 @javax.ws.rs.ApplicationPath("/")
