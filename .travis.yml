@@ -1,9 +1,5 @@
 language: generic
 
-cache:
-  directories:
-    - "$HOME/google-cloud-sdk/"
-
 dist: trusty
 
 script:
@@ -11,17 +7,6 @@ script:
 
 before_deploy:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - if [ ! -d "$HOME/google-cloud-sdk/bin" ]; then rm -rf $HOME/google-cloud-sdk; export CLOUDSDK_CORE_DISABLE_PROMPTS=1; curl https://sdk.cloud.google.com | bash; fi
-  - source /home/travis/google-cloud-sdk/path.bash.inc
-  - gcloud --quiet version
-  - gcloud --quiet components update
-  - gcloud --quiet components update kubectl
-  - echo $GCLOUD_KEY | base64 --decode -i > ${HOME}/gcloud-service-key.json
-  - gcloud auth activate-service-account --key-file ${HOME}/gcloud-service-key.json
-  - gcloud --quiet config set project $GOOGLE_PROJECT_NAME
-  - gcloud --quiet config set container/cluster $GOOGLE_CLUSTER_NAME
-  - gcloud --quiet config set compute/zone $GOOGLE_COMPUTE_ZONE
-  - gcloud --quiet container clusters get-credentials $GOOGLE_CLUSTER_NAME
 
 deploy:
   - provider: script
@@ -30,16 +15,14 @@ deploy:
       branch: develop
     script: >-
       docker tag ws-tls-scanner siwecos/ws-tls-scanner:develop &&
-      docker push siwecos/ws-tls-scanner:develop &&
-      kubectl patch deployment ws-tls-scanner --namespace staging -p '{"spec":{"template":{"metadata":{"labels":{"date":"`date +'%s'`", "commit":"$TRAVIS_COMMIT"}}}}}'
+      docker push siwecos/ws-tls-scanner:develop
   - provider: script
     skip_cleanup: true
     on:
       branch: master
     script: >-
       docker tag ws-tls-scanner siwecos/ws-tls-scanner:latest &&
-      docker push siwecos/ws-tls-scanner:latest &&
-      kubectl patch deployment ws-tls-scanner --namespace production -p '{"spec":{"template":{"metadata":{"labels":{"date":"`date +'%s'`", "commit":"$TRAVIS_COMMIT"}}}}}'
+      docker push siwecos/ws-tls-scanner:latest
   - provider: script
     skip_cleanup: true
     on:
