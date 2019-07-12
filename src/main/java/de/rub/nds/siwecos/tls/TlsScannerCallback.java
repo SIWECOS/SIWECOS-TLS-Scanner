@@ -382,9 +382,9 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CERTIFICATE_EXPIRED", report.getCertificateExpired() == null, null,
-                report.getCertificateExpired() ? 0 : 100, !report.getCertificateExpired() == Boolean.TRUE ? "success"
-                        : "critical", messageList);
+        return new TestResult("CERTIFICATE_EXPIRED", report.getCertificateChain().getContainsExpired() == null, null,
+                report.getCertificateChain().getContainsExpired() == Boolean.TRUE ? 0 : 100, !report.getCertificateChain().getContainsExpired() == Boolean.TRUE ? "success"
+                : "critical", messageList);
     }
 
     private TestResult getCertificateNotValidYet(SiteReport report) {
@@ -407,9 +407,9 @@ public class TlsScannerCallback implements Runnable {
             messageList = null;
         }
 
-        return new TestResult("CERTIFICATE_NOT_VALID_YET", report.getCertificateNotYetValid() == null, null,
-                report.getCertificateNotYetValid() ? 10 : 100,
-                !report.getCertificateNotYetValid() == Boolean.TRUE ? "success" : "warning", messageList);
+        return new TestResult("CERTIFICATE_NOT_VALID_YET", report.getCertificateChain().getContainsNotYetValid() == null, null,
+                report.getCertificateChain().getContainsNotYetValid() ? 10 : 100,
+                !report.getCertificateChain().getContainsNotYetValid() == Boolean.TRUE ? "success" : "warning", messageList);
     }
 
     private TestResult getCertificateNotSentByServer(SiteReport report) {
@@ -426,7 +426,7 @@ public class TlsScannerCallback implements Runnable {
         String certString = null;
         String hashAlgo = null;
         List<TranslateableMessage> messageList = new LinkedList<>();
-        if (report.getCertificateHasWeakHashAlgorithm() != null) {
+        if (report.getCertificateChain() != null) {
             for (CertificateReport certReport : report.getCertificateChain().getCertificateReportList()) {
                 if (certReport.getSignatureAndHashAlgorithm().getHashAlgorithm() == HashAlgorithm.MD5
                         || certReport.getSignatureAndHashAlgorithm().getHashAlgorithm() == HashAlgorithm.SHA1) {
@@ -451,15 +451,15 @@ public class TlsScannerCallback implements Runnable {
         }
         if (critical) {
             return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION",
-                    report.getCertificateHasWeakHashAlgorithm() == null, null,
-                    report.getCertificateHasWeakHashAlgorithm() ? 0 : 100,
-                    !report.getCertificateHasWeakHashAlgorithm() == Boolean.TRUE ? "success" : "critical", messageList);
+                    report.getCertificateChain().getContainsWeakSignedNonTruststoresCertificates() == null, null,
+                    report.getCertificateChain().getContainsWeakSignedNonTruststoresCertificates() ? 0 : 100,
+                    !report.getCertificateChain().getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "critical", messageList);
 
         } else {
             return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION",
-                    report.getCertificateHasWeakHashAlgorithm() == null, null,
-                    report.getCertificateHasWeakHashAlgorithm() ? 50 : 100,
-                    !report.getCertificateHasWeakHashAlgorithm() == Boolean.TRUE ? "success" : "warning", messageList);
+                    report.getCertificateChain().getContainsWeakSignedNonTruststoresCertificates() == null, null,
+                    report.getCertificateChain().getContainsWeakSignedNonTruststoresCertificates() ? 50 : 100,
+                    !report.getCertificateChain().getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "warning", messageList);
         }
     }
 
