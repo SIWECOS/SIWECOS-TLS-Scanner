@@ -116,7 +116,7 @@ public class TlsScannerCallback implements Runnable {
         debugOutput.setScanStartedAt(System.currentTimeMillis());
         debugOutput.setTimeInQueue(debugOutput.getLeftQueueAt() - debugOutput.getEnteredQueueAt());
         String id = callbackUrlsToId(request.getCallbackurls());
-        LOGGER.info("Scanning: " + request.getUrl() + " - " + id);
+        LOGGER.info("Scanning: " + request.getUrl() + " - " + id + " for " + type);
         for (String s : request.getCallbackurls()) {
             LOGGER.info("\tCallbackUrls: " + s);
         }
