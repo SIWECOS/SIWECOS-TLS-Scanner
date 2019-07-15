@@ -27,12 +27,12 @@ public class ScanResult {
 
     private TranslateableMessage errorMessage;
 
+    @JsonInclude(Include.NON_EMPTY)
+    private String scoreType;
+
     private int score;
 
     private List<TestResult> tests;
-
-    @JsonInclude(Include.NON_EMPTY)
-    private String scanType;
 
     @JsonInclude(Include.NON_EMPTY)
     private DebugOutput debugOutput;
@@ -103,11 +103,11 @@ public class ScanResult {
         this.tests = tests;
     }
 
-    public String getScanType() {
-        return scanType;
+    public String getScoreType() {
+        return scoreType;
     }
 
-    public void setScanType(String scanType) {
-        this.scanType = scanType;
+    public void setScoreType(String scoreType) {
+        this.scoreType = scoreType;
     }
 }

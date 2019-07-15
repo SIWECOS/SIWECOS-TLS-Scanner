@@ -319,7 +319,7 @@ public class TlsScannerCallback implements Runnable {
                 return new ScanResult(type.name(), true, getPortResponse(report), 0, new LinkedList<TestResult>());
             } else {
                 ScanResult result = new ScanResult(type.name(), true, getPortResponse(report), 100, new LinkedList<TestResult>());
-                result.setScanType("hidden");
+                result.setScoreType("hidden");
                 return result;
             }
         }
