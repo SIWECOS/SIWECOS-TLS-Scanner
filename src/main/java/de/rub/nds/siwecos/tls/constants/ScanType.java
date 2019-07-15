@@ -22,5 +22,6 @@ public enum ScanType {
     POP3,
     POP3S,
     IMAP,
-    IMAPS;
+    IMAPS,
+    MAIL; // Scans all mail services at the same time
 }

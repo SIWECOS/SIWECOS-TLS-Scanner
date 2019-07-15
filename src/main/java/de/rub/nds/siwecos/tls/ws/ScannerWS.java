@@ -132,6 +132,19 @@ public class ScannerWS {
     }
 
     @POST
+    @Path("/mail")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response scanMail(ScanRequest request) throws URISyntaxException {
+        LOGGER.info("Received a request to scan IMAPS: " + request.getUrl());
+        PoolManager
+                .getInstance()
+                .getService()
+                .submit(new TlsScannerCallback(request, MAIL, new DebugOutput(PoolManager.getInstance().getService()
+                        .getQueue().size(), System.currentTimeMillis())));
+        return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
+
+    @POST
     @Path("/poolconfig")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response changePoolSize(PoolsizeChangeRequest poolsizeChangeRequest) throws URISyntaxException {
