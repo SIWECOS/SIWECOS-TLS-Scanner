@@ -126,7 +126,7 @@ public class TlsScannerCallback implements Runnable {
             List<ScanResult> scanResultList = new LinkedList<>();
             try {
                 for (ScanType type : ScanType.values()) {
-                    if (type == ScanType.MAIL) {
+                    if (type == ScanType.MAIL || type == ScanType.HTTPS) {
                         continue;
                     } else {
                         ScanResult result = getScanResult(type, id, request);
