@@ -66,7 +66,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.Security;
@@ -134,9 +133,9 @@ public class TlsScannerCallback implements Runnable {
                         scanResultList.add(result);
                     }
                 }
-                answer(new CollectedScanResult(id, false, null, 0, scanResultList));
+                answer(new CollectedScanResult(type.name(), false, null, 0, scanResultList));
             } catch (Exception E) {
-                answer(new CollectedScanResult(id, true, new TranslateableMessage("REPORT_CONSTRUCTION",
+                answer(new CollectedScanResult(type.name(), true, new TranslateableMessage("REPORT_CONSTRUCTION",
                         new ErrorTestInfo(E.getMessage())), 0, scanResultList));
             }
         }
@@ -233,7 +232,7 @@ public class TlsScannerCallback implements Runnable {
             return result;
         } catch (Throwable T) {
             LOGGER.error("Failed to scan:" + request.getUrl() + " for " + type, T);
-            return new ScanResult("TLS", true, new TranslateableMessage("REPORT_CONSTRUCTION", new ErrorTestInfo(
+            return new ScanResult(type.name(), true, new TranslateableMessage("REPORT_CONSTRUCTION", new ErrorTestInfo(
                     T.getMessage())), 0, new LinkedList<TestResult>());
         } finally {
             Thread.currentThread().setName(Thread.currentThread().getName().replace("-" + request.getUrl(), ""));
@@ -319,7 +318,9 @@ public class TlsScannerCallback implements Runnable {
             if (type == ScanType.HTTPS) {
                 return new ScanResult(type.name(), true, getPortResponse(report), 0, new LinkedList<TestResult>());
             } else {
-                return new ScanResult(type.name(), true, getPortResponse(report), 100, new LinkedList<TestResult>());
+                ScanResult result = new ScanResult(type.name(), true, getPortResponse(report), 100, new LinkedList<TestResult>());
+                result.setScanType("hidden");
+                return result;
             }
         }
         if (!Objects.equals(report.getSupportsSslTls(), Boolean.TRUE)) {
@@ -414,7 +415,7 @@ public class TlsScannerCallback implements Runnable {
                 result.setScoreType("critical");
             }
         }
-        ScanResult result = new ScanResult("TLS", false, null, score, resultList);
+        ScanResult result = new ScanResult(type.name(), false, null, score, resultList);
         return result;
     }
 

@@ -32,6 +32,9 @@ public class ScanResult {
     private List<TestResult> tests;
 
     @JsonInclude(Include.NON_EMPTY)
+    private String scanType;
+
+    @JsonInclude(Include.NON_EMPTY)
     private DebugOutput debugOutput;
 
     public ScanResult(String name, boolean hasError, TranslateableMessage errorMessage, int score,
@@ -98,5 +101,13 @@ public class ScanResult {
 
     public void setTests(List<TestResult> tests) {
         this.tests = tests;
+    }
+
+    public String getScanType() {
+        return scanType;
+    }
+
+    public void setScanType(String scanType) {
+        this.scanType = scanType;
     }
 }
