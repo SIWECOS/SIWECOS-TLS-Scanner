@@ -11,7 +11,6 @@ package de.rub.nds.siwecos.tls.ws;
 
 import de.rub.nds.siwecos.tls.DebugManager;
 import de.rub.nds.siwecos.tls.TlsScannerCallback;
-import de.rub.nds.siwecos.tls.constants.ScanType;
 import static de.rub.nds.siwecos.tls.constants.ScanType.*;
 import java.net.URISyntaxException;
 import javax.ws.rs.Consumes;
@@ -41,14 +40,14 @@ public class ScannerWS {
     }
 
     @POST
-    @Path("/https")
+    @Path("/tls")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response scanHttps(ScanRequest request) throws URISyntaxException {
         LOGGER.info("Received a request to scan HTTPS of: " + request.getUrl());
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, HTTPS, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }

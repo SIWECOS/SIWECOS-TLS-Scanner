@@ -126,7 +126,7 @@ public class TlsScannerCallback implements Runnable {
             List<ScanResult> scanResultList = new LinkedList<>();
             try {
                 for (ScanType type : ScanType.values()) {
-                    if (type == ScanType.MAIL || type == ScanType.HTTPS) {
+                    if (type == ScanType.MAIL || type == ScanType.TLS) {
                         continue;
                     } else {
                         ScanResult result = getScanResult(type, id, request);
@@ -152,7 +152,7 @@ public class TlsScannerCallback implements Runnable {
             StarttlsDelegate starttlsDelegate = (StarttlsDelegate) scannerConfig.getDelegate(StarttlsDelegate.class);
 
             switch (type) {
-                case HTTPS:
+                case TLS:
                     port = 443;
                     break;
                 case IMAP:
@@ -315,7 +315,7 @@ public class TlsScannerCallback implements Runnable {
 
     public ScanResult reportToScanResult(SiteReport report, ScanType type) {
         if (!Objects.equals(report.getServerIsAlive(), Boolean.TRUE)) {
-            if (type == ScanType.HTTPS) {
+            if (type == ScanType.TLS) {
                 return new ScanResult(type.name(), true, getPortResponse(report), 0, new LinkedList<TestResult>());
             } else {
                 ScanResult result = new ScanResult(type.name(), true, getPortResponse(report), 100, new LinkedList<TestResult>());

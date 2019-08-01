@@ -194,7 +194,7 @@ public class TlsScannerCallbackTest {
         report.setTlsPoodleVulnerable(Boolean.TRUE);
         ScanType type = null;
         TlsScannerCallback instance = new TlsScannerCallback(null, null, null);
-        ScanResult reportToScanResult = instance.reportToScanResult(report, ScanType.HTTPS);
+        ScanResult reportToScanResult = instance.reportToScanResult(report, ScanType.TLS);
         System.out.println(instance.scanResultToJson(reportToScanResult));
     }
 
