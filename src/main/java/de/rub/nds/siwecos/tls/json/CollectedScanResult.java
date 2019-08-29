@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author Robert Merget - robert.merget@rub.de
  */
-public class ScanResult {
+public class CollectedScanResult {
 
     private String name;
 
@@ -27,24 +27,21 @@ public class ScanResult {
 
     private TranslateableMessage errorMessage;
 
-    @JsonInclude(Include.NON_EMPTY)
-    private String scoreType;
-
     private int score;
 
-    private List<TestResult> tests;
+    private List<ScanResult> scans;
 
     @JsonInclude(Include.NON_EMPTY)
     private DebugOutput debugOutput;
 
-    public ScanResult(String name, boolean hasError, TranslateableMessage errorMessage, int score,
-            List<TestResult> tests) {
+    public CollectedScanResult(String name, boolean hasError, TranslateableMessage errorMessage, int score,
+            List<ScanResult> scans) {
         this.name = name;
         this.version = "3.0.0";
         this.hasError = hasError;
         this.errorMessage = errorMessage;
         this.score = score;
-        this.tests = tests;
+        this.scans = scans;
     }
 
     public String getVersion() {
@@ -95,19 +92,11 @@ public class ScanResult {
         this.score = score;
     }
 
-    public List<TestResult> getTests() {
-        return tests;
+    public List<ScanResult> getScans() {
+        return scans;
     }
 
-    public void setTests(List<TestResult> tests) {
-        this.tests = tests;
-    }
-
-    public String getScoreType() {
-        return scoreType;
-    }
-
-    public void setScoreType(String scoreType) {
-        this.scoreType = scoreType;
+    public void setScans(List<ScanResult> scans) {
+        this.scans = scans;
     }
 }

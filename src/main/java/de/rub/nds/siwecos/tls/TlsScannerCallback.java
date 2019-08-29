@@ -11,9 +11,12 @@ package de.rub.nds.siwecos.tls;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import de.rub.nds.siwecos.tls.constants.ScanType;
 import de.rub.nds.siwecos.tls.json.CertificateTestInfo;
 import de.rub.nds.siwecos.tls.json.CiphersuitesTestInfo;
+import de.rub.nds.siwecos.tls.json.CollectedScanResult;
 import de.rub.nds.siwecos.tls.json.DateTestInfo;
+import de.rub.nds.siwecos.tls.json.ErrorTestInfo;
 import de.rub.nds.siwecos.tls.json.HashTestInfo;
 import de.rub.nds.siwecos.tls.json.HostTestInfo;
 import de.rub.nds.siwecos.tls.json.ScanResult;
@@ -25,8 +28,10 @@ import de.rub.nds.siwecos.tls.ws.PoolManager;
 import de.rub.nds.siwecos.tls.ws.ScanRequest;
 import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
+import de.rub.nds.tlsattacker.core.config.delegate.StarttlsDelegate;
 import de.rub.nds.tlsattacker.core.constants.CipherSuite;
 import de.rub.nds.tlsattacker.core.constants.HashAlgorithm;
+import de.rub.nds.tlsattacker.core.constants.StarttlsType;
 import de.rub.nds.tlsattacker.core.workflow.NamedThreadFactory;
 import de.rub.nds.tlsattacker.core.workflow.ParallelExecutor;
 import de.rub.nds.tlsscanner.MultiThreadedScanJobExecutor;
@@ -60,6 +65,7 @@ import de.rub.nds.tlsscanner.report.after.Sweet32AfterProbe;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.Security;
@@ -82,11 +88,14 @@ public class TlsScannerCallback implements Runnable {
 
     private final ScanRequest request;
 
-    private DebugOutput debugOutput;
+    private final DebugOutput debugOutput;
 
-    public TlsScannerCallback(ScanRequest request, DebugOutput debugOutput) {
+    private final ScanType type;
+
+    public TlsScannerCallback(ScanRequest request, ScanType type, DebugOutput debugOutput) {
         this.request = request;
         this.debugOutput = debugOutput;
+        this.type = type;
     }
 
     private String callbackUrlsToId(String[] urls) {
@@ -106,18 +115,73 @@ public class TlsScannerCallback implements Runnable {
         debugOutput.setScanStartedAt(System.currentTimeMillis());
         debugOutput.setTimeInQueue(debugOutput.getLeftQueueAt() - debugOutput.getEnteredQueueAt());
         String id = callbackUrlsToId(request.getCallbackurls());
-        LOGGER.info("Scanning: " + request.getUrl() + " - " + id);
+        LOGGER.info("Scanning: " + request.getUrl() + " - " + id + " for " + type);
         for (String s : request.getCallbackurls()) {
             LOGGER.info("\tCallbackUrls: " + s);
         }
-        try {
+        if (type != ScanType.MAIL) {
+            ScanResult result = getScanResult(type, id, request);
+            answer(result);
+        } else {
+            List<ScanResult> scanResultList = new LinkedList<>();
+            try {
+                for (ScanType type : ScanType.values()) {
+                    if (type == ScanType.MAIL || type == ScanType.TLS) {
+                        continue;
+                    } else {
+                        ScanResult result = getScanResult(type, id, request);
+                        scanResultList.add(result);
+                    }
+                }
+                answer(new CollectedScanResult(type.name(), false, null, 0, scanResultList));
+            } catch (Exception E) {
+                answer(new CollectedScanResult(type.name(), true, new TranslateableMessage("REPORT_CONSTRUCTION",
+                        new ErrorTestInfo(E.getMessage())), 0, scanResultList));
+            }
+        }
 
+    }
+
+    public ScanResult getScanResult(ScanType type, String id, ScanRequest request) {
+        try {
             ScannerConfig scannerConfig = new ScannerConfig(new GeneralDelegate());
             scannerConfig.setDangerLevel(request.getDangerLevel());
             scannerConfig.setScanDetail(ScannerDetail.QUICK);
             scannerConfig.setNoProgressbar(true);
+            int port = 443;
+            StarttlsDelegate starttlsDelegate = (StarttlsDelegate) scannerConfig.getDelegate(StarttlsDelegate.class);
+
+            switch (type) {
+                case TLS:
+                    port = 443;
+                    break;
+                case IMAP:
+                    starttlsDelegate.setStarttlsType(StarttlsType.IMAP);
+                    port = 143;
+                    break;
+                case IMAPS:
+                    port = 993;
+                    break;
+                case POP3:
+                    starttlsDelegate.setStarttlsType(StarttlsType.POP3);
+                    port = 110;
+                    break;
+                case POP3S:
+                    port = 995;
+                    break;
+                case SMTP:
+                    starttlsDelegate.setStarttlsType(StarttlsType.SMTP);
+                    port = 25;
+                    break;
+                case SMTPS:
+                    port = 465;
+                    break;
+            }
+
             ClientDelegate delegate = (ClientDelegate) scannerConfig.getDelegate(ClientDelegate.class);
-            delegate.setHost(request.getUrl().replace("https://", "").replace("http://", ""));
+            URI uri = new URI(request.getUrl());
+            delegate.setHost(uri.getHost() + ":" + port);
+            LOGGER.debug("Scanning: " + uri.getHost() + ":" + port + " for " + type);
             ParallelExecutor executor = new ParallelExecutor(PoolManager.getInstance().getParallelProbeThreads(), 3,
                     new NamedThreadFactory("" + id));
             List<TlsProbe> phaseOneList = new LinkedList<>();
@@ -135,8 +199,6 @@ public class TlsScannerCallback implements Runnable {
             phaseOneList.add(new Tls13Probe(scannerConfig, executor));
             // phaseOneList.add(new TokenbindingProbe(scannerConfig, executor));
             // phaseOneList.add(new HttpHeaderProbe(scannerConfig, executor));
-            phaseOneList.add(new CertificateProbe(scannerConfig, executor));
-
             // phaseTwoList.add(new ResumptionProbe(scannerConfig, executor));
             // phaseTwoList.add(new RenegotiationProbe(scannerConfig,
             // executor));
@@ -160,23 +222,35 @@ public class TlsScannerCallback implements Runnable {
             SiteReport report = scanner.scan();
             executor.shutdown();
             scanJobExecutor.shutdown();
-            ScanResult result = reportToScanResult(report);
-            LOGGER.info("Finished scanning: " + request.getUrl());
+            ScanResult result = reportToScanResult(report, type);
+            LOGGER.info("Finished scanning: " + request.getUrl() + " for " + type);
             debugOutput.setScanFinisedAt(System.currentTimeMillis());
             debugOutput.setFinalQueueSize(PoolManager.getInstance().getService().getQueue().size());
             if (DebugManager.getInstance().isDebugEnabled()) {
                 result.setDebugOutput(debugOutput);
             }
-            answer(result);
+            return result;
         } catch (Throwable T) {
-            LOGGER.error("Failed to scan:" + request.getUrl(), T);
-            answer(new ScanResult("TLS", true, null, 0, new LinkedList<TestResult>()));
+            LOGGER.error("Failed to scan:" + request.getUrl() + " for " + type, T);
+            return new ScanResult(type.name(), true, new TranslateableMessage("REPORT_CONSTRUCTION", new ErrorTestInfo(
+                    T.getMessage())), 0, new LinkedList<TestResult>());
         } finally {
             Thread.currentThread().setName(Thread.currentThread().getName().replace("-" + request.getUrl(), ""));
         }
     }
 
     public String scanResultToJson(ScanResult result) {
+        ObjectMapper ow = new ObjectMapper();
+        String json = "";
+        try {
+            json = ow.writeValueAsString(result);
+        } catch (JsonProcessingException ex) {
+            LOGGER.error("Could not convert to json", ex);
+        }
+        return json;
+    }
+
+    public String scanResultToJson(CollectedScanResult result) {
         ObjectMapper ow = new ObjectMapper();
         String json = "";
         try {
@@ -213,12 +287,44 @@ public class TlsScannerCallback implements Runnable {
         }
     }
 
-    public ScanResult reportToScanResult(SiteReport report) {
+    public void answer(CollectedScanResult result) {
+        String json = scanResultToJson(result);
+        for (String callback : request.getCallbackurls()) {
+            LOGGER.info("Calling back: " + callback + " for " + result.getName());
+            try {
+                URL url = new URL(callback);
+                URLConnection con = url.openConnection();
+                HttpURLConnection http = (HttpURLConnection) con;
+                http.setRequestMethod("POST");
+                http.setDoInput(true);
+                http.setDoOutput(true);
+                http.setFixedLengthStreamingMode(json.getBytes().length);
+                http.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+                http.connect();
+                try (OutputStream os = http.getOutputStream()) {
+                    os.write(json.getBytes("UTF-8"));
+                    os.flush();
+                }
+                LOGGER.debug(json);
+                http.disconnect();
+            } catch (IOException ex) {
+                LOGGER.warn("Failed to callback:" + callback, ex);
+            }
+        }
+    }
+
+    public ScanResult reportToScanResult(SiteReport report, ScanType type) {
         if (!Objects.equals(report.getServerIsAlive(), Boolean.TRUE)) {
-            return new ScanResult("TLS", true, getHttpsResponse(report), 0, new LinkedList<TestResult>());
+            if (type == ScanType.TLS) {
+                return new ScanResult(type.name(), true, getPortResponse(report), 0, new LinkedList<TestResult>());
+            } else {
+                ScanResult result = new ScanResult(type.name(), true, getPortResponse(report), 100, new LinkedList<TestResult>());
+                result.setScoreType("hidden");
+                return result;
+            }
         }
         if (!Objects.equals(report.getSupportsSslTls(), Boolean.TRUE)) {
-            return new ScanResult("TLS", true, getHttpsSupported(report), 0, new LinkedList<TestResult>());
+            return new ScanResult(type.name(), true, getTlsSupported(report), 0, new LinkedList<TestResult>());
         }
         List<TestResult> resultList = new LinkedList<>();
         if (report.getProbeTypeList().contains(ProbeType.CERTIFICATE)) {
@@ -309,24 +415,24 @@ public class TlsScannerCallback implements Runnable {
                 result.setScoreType("critical");
             }
         }
-        ScanResult result = new ScanResult("TLS", false, null, score, resultList);
+        ScanResult result = new ScanResult(type.name(), false, null, score, resultList);
         return result;
     }
 
-    private TranslateableMessage getHttpsResponse(SiteReport report) {
-        return new TranslateableMessage("HTTPS_RESPONSE", new HostTestInfo(report.getHost()));
+    private TranslateableMessage getPortResponse(SiteReport report) {
+        return new TranslateableMessage("PORT_NO_RESPONSE", new HostTestInfo(report.getHost()));
 
     }
 
-    private TranslateableMessage getHttpsSupported(SiteReport report) {
-        return new TranslateableMessage("HTTPS_SUPPORTED", new HostTestInfo(report.getHost()));
+    private TranslateableMessage getTlsSupported(SiteReport report) {
+        return new TranslateableMessage("TLS_NOT_SUPPORTED", new HostTestInfo(report.getHost()));
     }
 
     private TestResult getCertificateExpired(SiteReport report) {
         List<TranslateableMessage> messageList = new LinkedList<>();
         Date tempDate = null;
         String certString = null;
-        for (CertificateReport certReport : report.getCertificateReports()) {
+        for (CertificateReport certReport : report.getCertificateChain().getCertificateReportList()) {
             if (certReport.getValidTo().before(new Date(System.currentTimeMillis()))) {
                 tempDate = certReport.getValidTo();
                 certString = certReport.toString();
@@ -341,16 +447,17 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CERTIFICATE_EXPIRED", report.getCertificateExpired() == null, null,
-                report.getCertificateExpired() ? 0 : 100, !report.getCertificateExpired() == Boolean.TRUE ? "success"
-                : "critical", messageList);
+        return new TestResult("CERTIFICATE_EXPIRED", report.getCertificateChain().getContainsExpired() == null, null,
+                report.getCertificateChain().getContainsExpired() == Boolean.TRUE ? 0 : 100, !report
+                .getCertificateChain().getContainsExpired() == Boolean.TRUE ? "success" : "critical",
+                messageList);
     }
 
     private TestResult getCertificateNotValidYet(SiteReport report) {
         List<TranslateableMessage> messageList = new LinkedList<>();
         Date tempDate = null;
         String certString = null;
-        for (CertificateReport certReport : report.getCertificateReports()) {
+        for (CertificateReport certReport : report.getCertificateChain().getCertificateReportList()) {
             if (certReport.getValidFrom().after(new Date(System.currentTimeMillis()))) {
                 tempDate = certReport.getValidFrom();
                 certString = certReport.toString();
@@ -366,9 +473,11 @@ public class TlsScannerCallback implements Runnable {
             messageList = null;
         }
 
-        return new TestResult("CERTIFICATE_NOT_VALID_YET", report.getCertificateNotYetValid() == null, null,
-                report.getCertificateNotYetValid() ? 10 : 100,
-                !report.getCertificateNotYetValid() == Boolean.TRUE ? "success" : "warning", messageList);
+        return new TestResult("CERTIFICATE_NOT_VALID_YET",
+                report.getCertificateChain().getContainsNotYetValid() == null, null, report.getCertificateChain()
+                .getContainsNotYetValid() ? 10 : 100,
+                !report.getCertificateChain().getContainsNotYetValid() == Boolean.TRUE ? "success" : "warning",
+                messageList);
     }
 
     private TestResult getCertificateNotSentByServer(SiteReport report) {
@@ -385,8 +494,8 @@ public class TlsScannerCallback implements Runnable {
         String certString = null;
         String hashAlgo = null;
         List<TranslateableMessage> messageList = new LinkedList<>();
-        if (report.getCertificateHasWeakHashAlgorithm() != null) {
-            for (CertificateReport certReport : report.getCertificateReports()) {
+        if (report.getCertificateChain() != null) {
+            for (CertificateReport certReport : report.getCertificateChain().getCertificateReportList()) {
                 if (certReport.getSignatureAndHashAlgorithm().getHashAlgorithm() == HashAlgorithm.MD5
                         || certReport.getSignatureAndHashAlgorithm().getHashAlgorithm() == HashAlgorithm.SHA1) {
                     hashAlgo = certReport.getSignatureAndHashAlgorithm().getHashAlgorithm().name();
@@ -409,16 +518,18 @@ public class TlsScannerCallback implements Runnable {
             messageList = null;
         }
         if (critical) {
-            return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION",
-                    report.getCertificateHasWeakHashAlgorithm() == null, null,
-                    report.getCertificateHasWeakHashAlgorithm() ? 0 : 100,
-                    !report.getCertificateHasWeakHashAlgorithm() == Boolean.TRUE ? "success" : "critical", messageList);
+            return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION", report.getCertificateChain()
+                    .getContainsWeakSignedNonTruststoresCertificates() == null, null, report.getCertificateChain()
+                            .getContainsWeakSignedNonTruststoresCertificates() ? 0 : 100, !report.getCertificateChain()
+                            .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "critical",
+                    messageList);
 
         } else {
-            return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION",
-                    report.getCertificateHasWeakHashAlgorithm() == null, null,
-                    report.getCertificateHasWeakHashAlgorithm() ? 50 : 100,
-                    !report.getCertificateHasWeakHashAlgorithm() == Boolean.TRUE ? "success" : "warning", messageList);
+            return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION", report.getCertificateChain()
+                    .getContainsWeakSignedNonTruststoresCertificates() == null, null, report.getCertificateChain()
+                            .getContainsWeakSignedNonTruststoresCertificates() ? 50 : 100, !report.getCertificateChain()
+                            .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "warning",
+                    messageList);
         }
     }
 
@@ -435,9 +546,9 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CIPHERSUITE_ANON", report.getSupportsAnonCiphers() == null, null,
-                report.getSupportsAnonCiphers() == Boolean.TRUE ? 0 : 100,
-                !(report.getSupportsAnonCiphers() == Boolean.TRUE) ? "success" : "fatal", messageList);
+        return new TestResult("CIPHERSUITE_ANON", report.getSupportsAnonCiphers() == null, null, Objects.equals(
+                report.getSupportsAnonCiphers(), Boolean.TRUE) ? 0 : 100, !(Objects.equals(
+                report.getSupportsAnonCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
     }
 
     private TestInfo convertSuiteList(List<CipherSuite> suiteList) {
@@ -461,9 +572,9 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CIPHERSUITE_EXPORT", report.getSupportsExportCiphers() == null, null,
-                report.getSupportsExportCiphers() == Boolean.TRUE ? 0 : 100,
-                !(report.getSupportsExportCiphers() == Boolean.TRUE) ? "success" : "fatal", messageList);
+        return new TestResult("CIPHERSUITE_EXPORT", report.getSupportsExportCiphers() == null, null, Objects.equals(
+                report.getSupportsExportCiphers(), Boolean.TRUE) ? 0 : 100, !(Objects.equals(
+                report.getSupportsExportCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
     }
 
     private TestResult getSupportsNull(SiteReport report) {
