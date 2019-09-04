@@ -9,9 +9,6 @@
  */
 package de.rub.nds.siwecos.tls.json;
 
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  *
  * @author Robert Merget - robert.merget@rub.de
@@ -20,17 +17,11 @@ public class TranslateableMessage {
 
     private String translationStringId;
 
-    private List<TestInfo> placeholders;
+    private TestInfo placeholders;
 
-    public TranslateableMessage(String transladtionStringId, List<TestInfo> placeholders) {
+    public TranslateableMessage(String transladtionStringId, TestInfo placeholders) {
         this.translationStringId = transladtionStringId;
         this.placeholders = placeholders;
-    }
-
-    public TranslateableMessage(String translationStringId, TestInfo placeholder) {
-        this.translationStringId = translationStringId;
-        this.placeholders = new LinkedList<>();
-        placeholders.add(placeholder);
     }
 
     public String getTranslationStringId() {
@@ -41,11 +32,11 @@ public class TranslateableMessage {
         this.translationStringId = translationStringId;
     }
 
-    public List<TestInfo> getPlaceholders() {
+    public TestInfo getPlaceholders() {
         return placeholders;
     }
 
-    public void setPlaceholders(List<TestInfo> placeholders) {
+    public void setPlaceholders(TestInfo placeholders) {
         this.placeholders = placeholders;
     }
 }

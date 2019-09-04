@@ -318,7 +318,8 @@ public class TlsScannerCallback implements Runnable {
             if (type == ScanType.TLS) {
                 return new ScanResult(type.name(), true, getPortResponse(report), 0, new LinkedList<TestResult>());
             } else {
-                ScanResult result = new ScanResult(type.name(), true, getPortResponse(report), 100, new LinkedList<TestResult>());
+                ScanResult result = new ScanResult(type.name(), true, getPortResponse(report), 100,
+                        new LinkedList<TestResult>());
                 result.setScoreType("hidden");
                 return result;
             }
@@ -441,41 +442,37 @@ public class TlsScannerCallback implements Runnable {
         }
         if (tempDate != null) {
             List<TestInfo> pairList = new LinkedList<>();
-            pairList.add(new DateTestInfo(DateFormat.getDateInstance().format(tempDate)));
             pairList.add(new CertificateTestInfo(certString));
-            messageList.add(new TranslateableMessage("EXPIRED", pairList));
+            messageList.add(new TranslateableMessage("EXPIRED", new DateTestInfo(DateFormat.getDateInstance().format(
+                    tempDate))));
         } else {
             messageList = null;
         }
         return new TestResult("CERTIFICATE_EXPIRED", report.getCertificateChain().getContainsExpired() == null, null,
                 report.getCertificateChain().getContainsExpired() == Boolean.TRUE ? 0 : 100, !report
-                .getCertificateChain().getContainsExpired() == Boolean.TRUE ? "success" : "critical",
+                        .getCertificateChain().getContainsExpired() == Boolean.TRUE ? "success" : "critical",
                 messageList);
     }
 
     private TestResult getCertificateNotValidYet(SiteReport report) {
         List<TranslateableMessage> messageList = new LinkedList<>();
         Date tempDate = null;
-        String certString = null;
         for (CertificateReport certReport : report.getCertificateChain().getCertificateReportList()) {
             if (certReport.getValidFrom().after(new Date(System.currentTimeMillis()))) {
                 tempDate = certReport.getValidFrom();
-                certString = certReport.toString();
                 break;
             }
         }
         if (tempDate != null) {
-            List<TestInfo> pairList = new LinkedList<>();
-            pairList.add(new DateTestInfo(DateFormat.getDateInstance().format(tempDate)));
-            pairList.add(new CertificateTestInfo(certString));
-            messageList.add(new TranslateableMessage("NOT_YET_VALID", pairList));
+            messageList.add(new TranslateableMessage("NOT_YET_VALID", new DateTestInfo(DateFormat.getDateInstance()
+                    .format(tempDate))));
         } else {
             messageList = null;
         }
 
         return new TestResult("CERTIFICATE_NOT_VALID_YET",
                 report.getCertificateChain().getContainsNotYetValid() == null, null, report.getCertificateChain()
-                .getContainsNotYetValid() ? 10 : 100,
+                        .getContainsNotYetValid() ? 10 : 100,
                 !report.getCertificateChain().getContainsNotYetValid() == Boolean.TRUE ? "success" : "warning",
                 messageList);
     }
@@ -491,7 +488,6 @@ public class TlsScannerCallback implements Runnable {
     }
 
     private TestResult getCertificateWeakHashFunction(SiteReport report) {
-        String certString = null;
         String hashAlgo = null;
         List<TranslateableMessage> messageList = new LinkedList<>();
         if (report.getCertificateChain() != null) {
@@ -499,11 +495,7 @@ public class TlsScannerCallback implements Runnable {
                 if (certReport.getSignatureAndHashAlgorithm().getHashAlgorithm() == HashAlgorithm.MD5
                         || certReport.getSignatureAndHashAlgorithm().getHashAlgorithm() == HashAlgorithm.SHA1) {
                     hashAlgo = certReport.getSignatureAndHashAlgorithm().getHashAlgorithm().name();
-                    certString = certReport.toString();
-                    List<TestInfo> valuePairList = new LinkedList<>();
-                    valuePairList.add(new HashTestInfo(hashAlgo));
-                    valuePairList.add(new CertificateTestInfo(certString));
-                    messageList.add(new TranslateableMessage("HASH_ALGO", valuePairList));
+                    messageList.add(new TranslateableMessage("HASH_ALGO", new HashTestInfo(hashAlgo)));
 
                     break;
                 }
@@ -520,15 +512,15 @@ public class TlsScannerCallback implements Runnable {
         if (critical) {
             return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION", report.getCertificateChain()
                     .getContainsWeakSignedNonTruststoresCertificates() == null, null, report.getCertificateChain()
-                            .getContainsWeakSignedNonTruststoresCertificates() ? 0 : 100, !report.getCertificateChain()
-                            .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "critical",
+                    .getContainsWeakSignedNonTruststoresCertificates() ? 0 : 100, !report.getCertificateChain()
+                    .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "critical",
                     messageList);
 
         } else {
             return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION", report.getCertificateChain()
                     .getContainsWeakSignedNonTruststoresCertificates() == null, null, report.getCertificateChain()
-                            .getContainsWeakSignedNonTruststoresCertificates() ? 50 : 100, !report.getCertificateChain()
-                            .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "warning",
+                    .getContainsWeakSignedNonTruststoresCertificates() ? 50 : 100, !report.getCertificateChain()
+                    .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "warning",
                     messageList);
         }
     }

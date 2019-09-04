@@ -37,7 +37,7 @@ public class CollectedScanResult {
     public CollectedScanResult(String name, boolean hasError, TranslateableMessage errorMessage, int score,
             List<ScanResult> scans) {
         this.name = name;
-        this.version = "3.0.0";
+        this.version = "3.1.0";
         this.hasError = hasError;
         this.errorMessage = errorMessage;
         this.score = score;
