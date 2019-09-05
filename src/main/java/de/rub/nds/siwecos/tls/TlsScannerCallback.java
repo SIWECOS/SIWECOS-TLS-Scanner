@@ -26,6 +26,7 @@ import de.rub.nds.siwecos.tls.json.TestInfo;
 import de.rub.nds.siwecos.tls.ws.DebugOutput;
 import de.rub.nds.siwecos.tls.ws.PoolManager;
 import de.rub.nds.siwecos.tls.ws.ScanRequest;
+import de.rub.nds.tlsattacker.attacks.constants.EarlyCcsVulnerabilityType;
 import de.rub.nds.tlsattacker.core.config.delegate.ClientDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.GeneralDelegate;
 import de.rub.nds.tlsattacker.core.config.delegate.StarttlsDelegate;
@@ -209,7 +210,7 @@ public class TlsScannerCallback implements Runnable {
             phaseTwoList.add(new TlsPoodleProbe(scannerConfig, executor));
             // phaseTwoList.add(new Cve20162107Probe(scannerConfig, executor));
             phaseTwoList.add(new InvalidCurveProbe(scannerConfig, executor));
-            // phaseTwoList.add(new DrownProbe(scannerConfig, executor));
+            //phaseTwoList.add(new DrownProbe(scannerConfig, executor));
             phaseTwoList.add(new EarlyCcsProbe(scannerConfig, executor));
             // phaseTwoList.add(new MacProbe(scannerConfig, executor));
             afterList.add(new Sweet32AfterProbe());
@@ -360,6 +361,9 @@ public class TlsScannerCallback implements Runnable {
         if (report.getProbeTypeList().contains(ProbeType.HEARTBLEED)) {
             resultList.add(getHeartbleedVulnerable(report));
         }
+        if (report.getProbeTypeList().contains(ProbeType.EARLY_CCS)) {
+            resultList.add(getEarlyCcsVulnerable(report));
+        }
         if (report.getProbeTypeList().contains(ProbeType.INVALID_CURVE)) {
             resultList.add(getInvalidCurveEphemeralVulnerable(report));
             resultList.add(getInvalidCurveVulnerable(report));
@@ -450,7 +454,7 @@ public class TlsScannerCallback implements Runnable {
         }
         return new TestResult("CERTIFICATE_EXPIRED", report.getCertificateChain().getContainsExpired() == null, null,
                 report.getCertificateChain().getContainsExpired() == Boolean.TRUE ? 0 : 100, !report
-                        .getCertificateChain().getContainsExpired() == Boolean.TRUE ? "success" : "critical",
+                .getCertificateChain().getContainsExpired() == Boolean.TRUE ? "success" : "critical",
                 messageList);
     }
 
@@ -472,7 +476,7 @@ public class TlsScannerCallback implements Runnable {
 
         return new TestResult("CERTIFICATE_NOT_VALID_YET",
                 report.getCertificateChain().getContainsNotYetValid() == null, null, report.getCertificateChain()
-                        .getContainsNotYetValid() ? 10 : 100,
+                .getContainsNotYetValid() ? 10 : 100,
                 !report.getCertificateChain().getContainsNotYetValid() == Boolean.TRUE ? "success" : "warning",
                 messageList);
     }
@@ -512,15 +516,15 @@ public class TlsScannerCallback implements Runnable {
         if (critical) {
             return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION", report.getCertificateChain()
                     .getContainsWeakSignedNonTruststoresCertificates() == null, null, report.getCertificateChain()
-                    .getContainsWeakSignedNonTruststoresCertificates() ? 0 : 100, !report.getCertificateChain()
-                    .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "critical",
+                            .getContainsWeakSignedNonTruststoresCertificates() ? 0 : 100, !report.getCertificateChain()
+                            .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "critical",
                     messageList);
 
         } else {
             return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION", report.getCertificateChain()
                     .getContainsWeakSignedNonTruststoresCertificates() == null, null, report.getCertificateChain()
-                    .getContainsWeakSignedNonTruststoresCertificates() ? 50 : 100, !report.getCertificateChain()
-                    .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "warning",
+                            .getContainsWeakSignedNonTruststoresCertificates() ? 50 : 100, !report.getCertificateChain()
+                            .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "warning",
                     messageList);
         }
     }
@@ -706,5 +710,11 @@ public class TlsScannerCallback implements Runnable {
         return new TestResult("CIPHERSUITE_DES", report.getSupportsDesCiphers() == null, null,
                 report.getSupportsDesCiphers() == Boolean.TRUE ? 0 : 100,
                 !(report.getSupportsDesCiphers() == Boolean.TRUE) ? "success" : "warning", messageList);
+    }
+
+    private TestResult getEarlyCcsVulnerable(SiteReport report) {
+        return new TestResult("EARLYCCS_VULNERABLE", report.getEarlyCcsVulnerable()== null, null,
+                report.getEarlyCcsVulnerable() == EarlyCcsVulnerabilityType.VULN_EXPLOITABLE ? 0 : 100,
+                !(report.getEarlyCcsVulnerable() == EarlyCcsVulnerabilityType.VULN_EXPLOITABLE) ? "success" : "warning", null);
     }
 }
