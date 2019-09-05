@@ -24,6 +24,10 @@
         <Logger name="de.rub.nds.tlsattacker.core.state" level="ERROR"/>
         <Logger name="de.rub.nds.tlsattacker.core.constants" level="ERROR"/>
         <Logger name="de.rub.nds.tlsattacker" level="ERROR"/>
+        <Logger name="de.rub.nds.tlsattacker.attacks.impl.BleichenbacherAttacker" level="OFF"/>
+        <Logger name="de.rub.nds.tlsattacker.attacks.impl.PaddingOracleAttacker" level="OFF"/>
+        <Logger name="de.rub.nds.tlsattacker.core.workflow.task.TlsTask" level="OFF"/>
+        <Logger name="de.rub.nds.tlsattacker.core.workflow.task.TlsProbe" level="OFF"/>
         <Logger name="de.rub.nds.modifiablevariable" level="ERROR"/>
         <Logger name="DirectLogger" level="OFF"/>
         <Logger name="ConsoleLogger" level="OFF"/>
