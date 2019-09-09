@@ -713,8 +713,12 @@ public class TlsScannerCallback implements Runnable {
     }
 
     private TestResult getEarlyCcsVulnerable(SiteReport report) {
-        return new TestResult("EARLYCCS_VULNERABLE", report.getEarlyCcsVulnerable()== null, null,
+        return new TestResult(
+                "EARLYCCS_VULNERABLE",
+                report.getEarlyCcsVulnerable() == null,
+                null,
                 report.getEarlyCcsVulnerable() == EarlyCcsVulnerabilityType.VULN_EXPLOITABLE ? 0 : 100,
-                !(report.getEarlyCcsVulnerable() == EarlyCcsVulnerabilityType.VULN_EXPLOITABLE) ? "success" : "warning", null);
+                !(report.getEarlyCcsVulnerable() == EarlyCcsVulnerabilityType.VULN_EXPLOITABLE) ? "success" : "warning",
+                null);
     }
 }
