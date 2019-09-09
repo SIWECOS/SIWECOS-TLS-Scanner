@@ -12,7 +12,7 @@ $ mvn clean package
 
 For hints on installing the required libraries checkout the corresponding GitHub repositories.
 
-**Please note:**  *In order to run this tool you need TLS-Attacker 3.0*
+**Please note:**  *In order to run this tool you need TLS-Attacker 3.2*
 
 # Running
 In order to run WS-TLS-Scanner you need to deploy the .war file from the target/ folder to your favourite java application server (eg. Glassfish, Tomcat ...). After that the webservice should be up and running and can be called by sending a POST like
@@ -27,7 +27,7 @@ In order to run WS-TLS-Scanner you need to deploy the .war file from the target/
 ```
 to either
 ```
-http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/https
+http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/tls
 http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/pop3
 http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/pop3s
 http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/imap
@@ -40,7 +40,7 @@ http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/smtps
 or 
 
 ```
-http://127.0.0.1:8080/https
+http://127.0.0.1:8080/tls
 http://127.0.0.1:8080/pop3
 http://127.0.0.1:8080/pop3s
 http://127.0.0.1:8080/imap
@@ -57,9 +57,8 @@ TLS-Scanner uses the concept of "checks" which are performed after it collected 
 
 An example output may look like this:
 ```json
-
 {
-  "name" : "HTTPS",
+  "name" : "TLS",
   "hasError" : false,
   "errorMessage" : null,
   "score" : 0,
@@ -257,16 +256,15 @@ An example output may look like this:
 }
 ```
 
-
 | Check                               | Meaning                                                                  | 
 | ----------------------------------- |:------------------------------------------------------------------------:|
 | HTTPS_NO_RESPONSE                   | Checks if we get any response on port 443                                |
 | HTTPS_NOT_SUPPORTED                 | Checks if the server supports TLS on port 443                            |
-| CERTIFICATE_EXPIRED                 | Checks if the Certificate is expired yet                                 |
-| CERTIFICATE_NOT_VALID_YET           | Checks if the Certificate is valid yet                                   |
-| CERTIFICATE_WEAK_HASH_FUNCTION      | Checks if the Server uses a weak Hash algorithm for its Certificate      |
-| CERTIFICATE_WEAK_SIGN_ALGORITHM     | Checks if the Server uses a weak Signature algorithm for its Certificate |
-| CERTIFICATE_NOT_SENT_BY_SERVER      | Checks if the Server did send a Certificate at all                       |
+| CERTIFICATE_EXPIRED                 | Checks if the Certificate is expired yet                                  |
+| CERTIFICATE_NOT_VALID_YET           | Checks if the Certificate is valid yet                                    |
+| CERTIFICATE_WEAK_HASH_FUNCTION      | Checks if the Server uses a weak Hash algorithm for its Certificate       |
+| CERTIFICATE_WEAK_SIGN_ALGORITHM     | Checks if the Server uses a weak Signature algorithm for its Certificate  |
+| CERTIFICATE_NOT_SENT_BY_SERVER      | Checks if the Server did send a Certificate at all                        |
 | CIPHERSUITE_ANON                    | Checks if the Server has Anon Ciphersuites enabled                       |
 | CIPHERSUITE_CBC                     | Checks if the Server has CBC Ciphersuites enabled for TLS 1.0            | 
 | CIPHERSUITE_EXPORT                  | Checks if the Server has Export Ciphersuites enabled                     |
@@ -285,7 +283,7 @@ An example output may look like this:
 | CRIME_VULNERABLE                    | Checks if the Server is vulnerable to the CRIME attack                   |
 | SWEET32_VULNERABLE                  | Checks if the Server is vulnerable to the SWEET32 attack                 |
 | HEARTBLEED_VULNERABLE               | Checks if the Server is vulnerable to the Heartbleed attack              |
-| CVE20162107_VULNERABLE              | Checks if the Server is vulnerable to CVE-2016-2107 	                   |
+| CVE20162107_VULNERABLE              | Checks if the Server is vulnerable to CVE-2016-2107 	                 |
 
 
 
