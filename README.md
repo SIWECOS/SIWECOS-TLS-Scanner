@@ -260,31 +260,31 @@ An example output may look like this:
 | ----------------------------------- |:------------------------------------------------------------------------:|
 | HTTPS_NO_RESPONSE                   | Checks if we get any response on port 443                                |
 | HTTPS_NOT_SUPPORTED                 | Checks if the server supports TLS on port 443                            |
-| CERTIFICATE_EXPIRED                 | Checks if the Certificate is expired yet                                  |
-| CERTIFICATE_NOT_VALID_YET           | Checks if the Certificate is valid yet                                    |
-| CERTIFICATE_WEAK_HASH_FUNCTION      | Checks if the Server uses a weak Hash algorithm for its Certificate       |
-| CERTIFICATE_WEAK_SIGN_ALGORITHM     | Checks if the Server uses a weak Signature algorithm for its Certificate  |
-| CERTIFICATE_NOT_SENT_BY_SERVER      | Checks if the Server did send a Certificate at all                        |
-| CIPHERSUITE_ANON                    | Checks if the Server has Anon Ciphersuites enabled                       |
-| CIPHERSUITE_CBC                     | Checks if the Server has CBC Ciphersuites enabled for TLS 1.0            | 
-| CIPHERSUITE_EXPORT                  | Checks if the Server has Export Ciphersuites enabled                     |
-| CIPHERSUITE_NULL                    | Checks if the Server has Null Ciphersuites enabled                       |
-| CIPHERSUITE_RC4                     | Checks if the Server has RC4 Ciphersuites enabled                        |
-| CIPHERSUITEORDER_ENFORCED           | Checks if the Server does not enforce a Ciphersuite ordering             |
+| CERTIFICATE_EXPIRED                 | Checks if the certificate is expired yet                                  |
+| CERTIFICATE_NOT_VALID_YET           | Checks if the certificate is valid yet                                    |
+| CERTIFICATE_WEAK_HASH_FUNCTION      | Checks if the server uses a weak hash algorithm for its certificate       |
+| CERTIFICATE_WEAK_SIGN_ALGORITHM     | Checks if the server uses a weak signature algorithm for its certificate  |
+| CERTIFICATE_NOT_SENT_BY_SERVER      | Checks if the server did send a certificate at all                        |
+| CIPHERSUITE_ANON                    | Checks if the server has ANON ciphersuites enabled                       |
+| CIPHERSUITE_CBC                     | Checks if the server has CBC ciphersuites enabled for TLS 1.0            | 
+| CIPHERSUITE_EXPORT                  | Checks if the server has EXPORT ciphersuites enabled                     |
+| CIPHERSUITE_NULL                    | Checks if the server has NULL ciphersuites enabled                       |
+| CIPHERSUITE_RC4                     | Checks if the server has RC4 ciphersuites enabled                        |
+| CIPHERSUITEORDER_ENFORCED           | Checks if the server does not enforce a ciphersuite ordering             |
 | PROTOCOLVERSION_SSL2                | Checks if SSL 2 is enabled                                               |
 | PROTOCOLVERSION_SSL3                | Checks if SSL 3 is enabled                                               |
-| PROTOCOLVERSION_TLS13               | Checks if the Server supports TLS 1.3                                    |
-| BLEICHENBACHER_VULNERABLE           | Checks if the Server is vulnerable to the Bleichenbacher attack (ROBOT)  |
-| PADDING_ORACLE_VULNERABLE           | Checks if the Server is vulnerable to the Padding Oracle attack          |
-| INVALID_CURVE_VULNERABLE            | Checks if the Server is vulnerable to the Invalid Curve attack           |
-| INVALID_CURVE_EPHEMERAL_VULNERABLE  | Checks if the Server is vulnerable to the Ephemeral Invalid Curve attack |
-| POODLE_VULNERABLE                   | Checks if the Server is vulnerable to the Poodle attack                  |
-| TLS_POODLE_VULNERABLE               | Checks if the Server is vulnerable to the TLS-Poodle attack              |
-| CRIME_VULNERABLE                    | Checks if the Server is vulnerable to the CRIME attack                   |
-| SWEET32_VULNERABLE                  | Checks if the Server is vulnerable to the SWEET32 attack                 |
-| HEARTBLEED_VULNERABLE               | Checks if the Server is vulnerable to the Heartbleed attack              |
-| CVE20162107_VULNERABLE              | Checks if the Server is vulnerable to CVE-2016-2107 	                 |
-
+| PROTOCOLVERSION_TLS13               | Checks if the server supports TLS 1.3                                    |
+| BLEICHENBACHER_VULNERABLE           | Checks if the server is vulnerable to the Bleichenbacher attack (ROBOT)  |
+| PADDING_ORACLE_VULNERABLE           | Checks if the server is vulnerable to the Padding Oracle attack          |
+| INVALID_CURVE_VULNERABLE            | Checks if the server is vulnerable to the Invalid Curve attack           |
+| INVALID_CURVE_EPHEMERAL_VULNERABLE  | Checks if the server is vulnerable to the Ephemeral Invalid Curve attack |
+| POODLE_VULNERABLE                   | Checks if the server is vulnerable to the Poodle attack                  |
+| TLS_POODLE_VULNERABLE               | Checks if the server is vulnerable to the TLS-Poodle attack              |
+| CRIME_VULNERABLE                    | Checks if the server is vulnerable to the CRIME attack                   |
+| SWEET32_VULNERABLE                  | Checks if the server is vulnerable to the SWEET32 attack                 |
+| HEARTBLEED_VULNERABLE               | Checks if the server is vulnerable to the Heartbleed attack              |
+| CVE20162107_VULNERABLE              | Checks if the server is vulnerable to CVE-2016-2107 	                 |
+| EARLYCCS_VULNERABLE				  | Checks if the server is vulnerable to the EarlyCCS attack				 |
 
 
 
