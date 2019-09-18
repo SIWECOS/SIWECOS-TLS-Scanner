@@ -210,7 +210,7 @@ public class TlsScannerCallback implements Runnable {
             phaseTwoList.add(new TlsPoodleProbe(scannerConfig, executor));
             // phaseTwoList.add(new Cve20162107Probe(scannerConfig, executor));
             phaseTwoList.add(new InvalidCurveProbe(scannerConfig, executor));
-            //phaseTwoList.add(new DrownProbe(scannerConfig, executor));
+            // phaseTwoList.add(new DrownProbe(scannerConfig, executor));
             phaseTwoList.add(new EarlyCcsProbe(scannerConfig, executor));
             // phaseTwoList.add(new MacProbe(scannerConfig, executor));
             afterList.add(new Sweet32AfterProbe());
@@ -452,9 +452,16 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CERTIFICATE_EXPIRED", report.getCertificateChain().getContainsExpired() == null, null,
-                report.getCertificateChain().getContainsExpired() == Boolean.TRUE ? 0 : 100, !report
-                .getCertificateChain().getContainsExpired() == Boolean.TRUE ? "success" : "critical",
+        boolean hasError = report.getCertificateChain().getContainsExpired() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("CERTIFICATE_EXPIRED", hasError, errorMessage, report.getCertificateChain()
+                .getContainsExpired() == Boolean.TRUE ? 0 : 100,
+                !report.getCertificateChain().getContainsExpired() == Boolean.TRUE ? "success" : "critical",
                 messageList);
     }
 
@@ -473,22 +480,33 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-
-        return new TestResult("CERTIFICATE_NOT_VALID_YET",
-                report.getCertificateChain().getContainsNotYetValid() == null, null, report.getCertificateChain()
+        boolean hasError = report.getCertificateChain().getContainsNotYetValid() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("CERTIFICATE_NOT_VALID_YET", hasError, errorMessage, report.getCertificateChain()
                 .getContainsNotYetValid() ? 10 : 100,
                 !report.getCertificateChain().getContainsNotYetValid() == Boolean.TRUE ? "success" : "warning",
                 messageList);
     }
 
     private TestResult getCertificateNotSentByServer(SiteReport report) {
-        if (report.getCertificate() == null) {
-            return new TestResult("CERTIFICATE_NOT_SENT_BY_SERVER", report.getCertificate() == null, null, 0,
-                    "critical", null);
+        boolean hasError = report.getCertificate() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
-        return new TestResult("CERTIFICATE_NOT_SENT_BY_SERVER", report.getCertificate() == null, null, report
-                .getCertificate().getLength() > 0 ? 100 : 0, report.getCertificate().getLength() > 0 ? "hidden"
-                : "critical", null);
+
+        if (report.getCertificate() == null) {
+            return new TestResult("CERTIFICATE_NOT_SENT_BY_SERVER", hasError, errorMessage, 0, "critical", null);
+        }
+        return new TestResult("CERTIFICATE_NOT_SENT_BY_SERVER", hasError, errorMessage, report.getCertificate()
+                .getLength() > 0 ? 100 : 0, report.getCertificate().getLength() > 0 ? "hidden" : "critical", null);
     }
 
     private TestResult getCertificateWeakHashFunction(SiteReport report) {
@@ -513,18 +531,28 @@ public class TlsScannerCallback implements Runnable {
         if (messageList.isEmpty()) {
             messageList = null;
         }
+        boolean hasError = report.getCertificateChain().getContainsWeakSignedNonTruststoresCertificates() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
         if (critical) {
-            return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION", report.getCertificateChain()
-                    .getContainsWeakSignedNonTruststoresCertificates() == null, null, report.getCertificateChain()
-                            .getContainsWeakSignedNonTruststoresCertificates() ? 0 : 100, !report.getCertificateChain()
-                            .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "critical",
-                    messageList);
+            return new TestResult(
+                    "CERTIFICATE_WEAK_HASH_FUNCTION",
+                    hasError,
+                    errorMessage,
+                    report.getCertificateChain().getContainsWeakSignedNonTruststoresCertificates() ? 0 : 100,
+                    !report.getCertificateChain().getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success"
+                            : "critical", messageList);
 
         } else {
+
             return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION", report.getCertificateChain()
                     .getContainsWeakSignedNonTruststoresCertificates() == null, null, report.getCertificateChain()
-                            .getContainsWeakSignedNonTruststoresCertificates() ? 50 : 100, !report.getCertificateChain()
-                            .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "warning",
+                    .getContainsWeakSignedNonTruststoresCertificates() ? 50 : 100, !report.getCertificateChain()
+                    .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "warning",
                     messageList);
         }
     }
@@ -542,7 +570,14 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CIPHERSUITE_ANON", report.getSupportsAnonCiphers() == null, null, Objects.equals(
+        boolean hasError = report.getSupportsAnonCiphers() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("CIPHERSUITE_ANON", hasError, errorMessage, Objects.equals(
                 report.getSupportsAnonCiphers(), Boolean.TRUE) ? 0 : 100, !(Objects.equals(
                 report.getSupportsAnonCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
     }
@@ -568,7 +603,14 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CIPHERSUITE_EXPORT", report.getSupportsExportCiphers() == null, null, Objects.equals(
+        boolean hasError = report.getSupportsExportCiphers() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("CIPHERSUITE_EXPORT", hasError, errorMessage, Objects.equals(
                 report.getSupportsExportCiphers(), Boolean.TRUE) ? 0 : 100, !(Objects.equals(
                 report.getSupportsExportCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
     }
@@ -586,7 +628,14 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CIPHERSUITE_NULL", report.getSupportsNullCiphers() == null, null,
+        boolean hasError = report.getSupportsNullCiphers() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("CIPHERSUITE_NULL", hasError, errorMessage,
                 report.getSupportsNullCiphers() == Boolean.TRUE ? 0 : 100,
                 !(report.getSupportsNullCiphers() == Boolean.TRUE) ? "success" : "fatal", messageList);
     }
@@ -604,92 +653,196 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CIPHERSUITE_RC4", report.getSupportsRc4Ciphers() == null, null,
+        boolean hasError = report.getSupportsRc4Ciphers() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("CIPHERSUITE_RC4", hasError, errorMessage,
                 report.getSupportsRc4Ciphers() == Boolean.TRUE ? 30 : 100,
                 !(report.getSupportsRc4Ciphers() == Boolean.TRUE) ? "success" : "warning", messageList);
     }
 
     private TestResult getCipherSuiteOrder(SiteReport report) {
-        return new TestResult("CIPHERSUITEORDER_ENFORCED", report.getEnforcesCipherSuiteOrdering() == null, null,
+        boolean hasError = report.getEnforcesCipherSuiteOrdering() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("CIPHERSUITEORDER_ENFORCED", hasError, errorMessage,
                 report.getEnforcesCipherSuiteOrdering() == Boolean.TRUE ? 100 : 90,
                 (report.getEnforcesCipherSuiteOrdering() == Boolean.TRUE) ? "success" : "warning", null);
     }
 
     private TestResult getSupportsSsl2(SiteReport report) {
-        return new TestResult("PROTOCOLVERSION_SSL2", report.getSupportsSsl2() == null, null,
+        boolean hasError = report.getSupportsSsl2() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("PROTOCOLVERSION_SSL2", hasError, errorMessage,
                 report.getSupportsSsl2() == Boolean.TRUE ? 0 : 100,
                 !(report.getSupportsSsl3() == Boolean.TRUE) ? "success" : "fatal", null);
     }
 
     private TestResult getSupportsSsl3(SiteReport report) {
-        return new TestResult("PROTOCOLVERSION_SSL3", report.getSupportsSsl3() == null, null,
+        boolean hasError = report.getSupportsSsl3() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("PROTOCOLVERSION_SSL3", hasError, errorMessage,
                 report.getSupportsSsl3() == Boolean.TRUE ? 0 : 100,
                 !(report.getSupportsSsl3() == Boolean.TRUE) ? "success" : "critical", null);
     }
 
     private TestResult getBleichenbacherVulnerable(SiteReport report) {
-        return new TestResult("BLEICHENBACHER_VULNERABLE", report.getBleichenbacherVulnerable() == null, null,
+        boolean hasError = report.getBleichenbacherVulnerable() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("BLEICHENBACHER_VULNERABLE", hasError, errorMessage,
                 report.getBleichenbacherVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getBleichenbacherVulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
 
     private TestResult getPaddingOracleVulnerable(SiteReport report) {
-        return new TestResult("PADDING_ORACLE_VULNERABLE", report.getPaddingOracleVulnerable() == null, null,
+        boolean hasError = report.getPaddingOracleVulnerable() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("PADDING_ORACLE_VULNERABLE", hasError, errorMessage,
                 report.getPaddingOracleVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getPaddingOracleVulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
 
     private TestResult getInvalidCurveVulnerable(SiteReport report) {
-        return new TestResult("INVALID_CURVE_VULNERABLE", report.getInvalidCurveVulnerable() == null, null,
+        boolean hasError = report.getInvalidCurveVulnerable() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("INVALID_CURVE_VULNERABLE", hasError, errorMessage,
                 report.getInvalidCurveVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getInvalidCurveVulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
 
     private TestResult getCve20162107Vulnerable(SiteReport report) {
-        return new TestResult("CVE20162107_VULNERABLE", report.getCve20162107Vulnerable() == null, null,
+        boolean hasError = report.getCve20162107Vulnerable() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("CVE20162107_VULNERABLE", hasError, errorMessage,
                 report.getCve20162107Vulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getCve20162107Vulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
 
     private TestResult getInvalidCurveEphemeralVulnerable(SiteReport report) {
-        return new TestResult("INVALID_CURVE_EPHEMERAL_VULNERABLE",
-                report.getInvalidCurveEphermaralVulnerable() == null, null,
+        boolean hasError = report.getInvalidCurveEphermaralVulnerable() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("INVALID_CURVE_EPHEMERAL_VULNERABLE", hasError, errorMessage,
                 report.getInvalidCurveEphermaralVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getInvalidCurveEphermaralVulnerable() == Boolean.TRUE) ? "success" : "warning", null);
     }
 
     private TestResult getPoodleVulnerable(SiteReport report) {
-        return new TestResult("POODLE_VULNERABLE", report.getPoodleVulnerable() == null, null,
+        boolean hasError = report.getPoodleVulnerable() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("POODLE_VULNERABLE", hasError, errorMessage,
                 report.getPoodleVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getPoodleVulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
 
     private TestResult getTlsPoodleVulnerable(SiteReport report) {
-        return new TestResult("TLS_POODLE_VULNERABLE", report.getTlsPoodleVulnerable() == null, null,
+        boolean hasError = report.getTlsPoodleVulnerable() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("TLS_POODLE_VULNERABLE", hasError, errorMessage,
                 report.getTlsPoodleVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getTlsPoodleVulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
 
     private TestResult getCrimeVulnerable(SiteReport report) {
-        return new TestResult("CRIME_VULNERABLE", report.getCrimeVulnerable() == null, null,
+        boolean hasError = report.getCrimeVulnerable() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("CRIME_VULNERABLE", hasError, errorMessage,
                 report.getCrimeVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getCrimeVulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
 
     private TestResult getSweet32Vulnerable(SiteReport report) {
-        return new TestResult("SWEET32_VULNERABLE", report.getSweet32Vulnerable() == null, null,
+        boolean hasError = report.getSweet32Vulnerable() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("SWEET32_VULNERABLE", hasError, errorMessage,
                 report.getSweet32Vulnerable() == Boolean.TRUE ? 80 : 100,
                 !(report.getSweet32Vulnerable() == Boolean.TRUE) ? "success" : "warning", null);
     }
 
     private TestResult getHeartbleedVulnerable(SiteReport report) {
-        return new TestResult("HEARTBLEED_VULNERABLE", report.getHeartbleedVulnerable() == null, null,
+        boolean hasError = report.getHeartbleedVulnerable() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("HEARTBLEED_VULNERABLE", hasError, errorMessage,
                 report.getHeartbleedVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getHeartbleedVulnerable() == Boolean.TRUE) ? "success" : "fatal", null);
     }
 
     private TestResult getSupportsTls13(SiteReport report) {
-        return new TestResult("PROTOCOLVERSION_TLS13", report.supportsAnyTls13() == null, null,
+        boolean hasError = report.supportsAnyTls13() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("PROTOCOLVERSION_TLS13", hasError, errorMessage,
                 report.supportsAnyTls13() == Boolean.TRUE ? 100 : 0,
                 report.supportsAnyTls13() == Boolean.TRUE ? "bonus" : "hidden", null);
     }
@@ -707,16 +860,32 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-        return new TestResult("CIPHERSUITE_DES", report.getSupportsDesCiphers() == null, null,
+
+        boolean hasError = report.getSupportsDesCiphers() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+        return new TestResult("CIPHERSUITE_DES", hasError, errorMessage,
                 report.getSupportsDesCiphers() == Boolean.TRUE ? 0 : 100,
                 !(report.getSupportsDesCiphers() == Boolean.TRUE) ? "success" : "warning", messageList);
     }
 
     private TestResult getEarlyCcsVulnerable(SiteReport report) {
+        boolean hasError = report.getEarlyCcsVulnerable() == null;
+        TranslateableMessage errorMessage = null;
+        if (hasError == Boolean.TRUE)
+            ;
+        {
+            errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
+        }
+
         return new TestResult(
                 "EARLYCCS_VULNERABLE",
-                report.getEarlyCcsVulnerable() == null,
-                null,
+                hasError,
+                errorMessage,
                 report.getEarlyCcsVulnerable() == EarlyCcsVulnerabilityType.VULN_EXPLOITABLE ? 0 : 100,
                 !(report.getEarlyCcsVulnerable() == EarlyCcsVulnerabilityType.VULN_EXPLOITABLE) ? "success" : "warning",
                 null);
