@@ -283,7 +283,7 @@ public class TlsScannerCallback implements Runnable {
                 }
                 LOGGER.debug(json);
                 http.disconnect();
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 LOGGER.warn("Failed to callback:" + callback, ex);
             }
         }
