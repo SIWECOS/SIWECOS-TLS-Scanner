@@ -270,6 +270,7 @@ public class TlsScannerCallback implements Runnable {
                 URL url = new URL(callback);
                 URLConnection con = url.openConnection();
                 HttpURLConnection http = (HttpURLConnection) con;
+                con.setConnectTimeout(10000);
                 http.setRequestMethod("POST");
                 http.setDoInput(true);
                 http.setDoOutput(true);
