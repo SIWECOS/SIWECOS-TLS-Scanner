@@ -46,7 +46,8 @@ public class ScannerWS {
         LOGGER.info("Received a request to scan HTTPS of: " + request.getUrl());
         if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
             LOGGER.warn("No callback urls provided");
-            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided").type(MediaType.TEXT_PLAIN_TYPE).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         PoolManager
                 .getInstance()
@@ -63,12 +64,13 @@ public class ScannerWS {
         LOGGER.info("Received a request to scan SMTP(STARTTLS) of: " + request.getUrl());
         if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
             LOGGER.warn("No callback urls provided");
-            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided").type(MediaType.TEXT_PLAIN_TYPE).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, SMTP, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, SMTP_TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -80,12 +82,13 @@ public class ScannerWS {
         LOGGER.info("Received a request to scan SMTP of: " + request.getUrl());
         if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
             LOGGER.warn("No callback urls provided");
-            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided").type(MediaType.TEXT_PLAIN_TYPE).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, SMTPS, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, SMTPS_TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -97,12 +100,13 @@ public class ScannerWS {
         LOGGER.info("Received a request to scan POP3(STARTTLS) of: " + request.getUrl());
         if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
             LOGGER.warn("No callback urls provided");
-            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided").type(MediaType.TEXT_PLAIN_TYPE).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, POP3, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, POP3_TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -114,12 +118,13 @@ public class ScannerWS {
         LOGGER.info("Received a request to scan POP3S of: " + request.getUrl());
         if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
             LOGGER.warn("No callback urls provided");
-            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided").type(MediaType.TEXT_PLAIN_TYPE).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, POP3S, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, POP3S_TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -131,12 +136,13 @@ public class ScannerWS {
         LOGGER.info("Received a request to scan IMAP(STARTTLS): " + request.getUrl());
         if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
             LOGGER.warn("No callback urls provided");
-            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided").type(MediaType.TEXT_PLAIN_TYPE).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, IMAP, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, IMAP_TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -148,12 +154,13 @@ public class ScannerWS {
         LOGGER.info("Received a request to scan IMAPS: " + request.getUrl());
         if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
             LOGGER.warn("No callback urls provided");
-            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided").type(MediaType.TEXT_PLAIN_TYPE).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, IMAPS, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, IMAPS_TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -165,7 +172,8 @@ public class ScannerWS {
         LOGGER.info("Received a request to scan Mail: " + request.getUrl());
         if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
             LOGGER.warn("No callback urls provided");
-            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided").type(MediaType.TEXT_PLAIN_TYPE).build();
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
         }
         PoolManager
                 .getInstance()

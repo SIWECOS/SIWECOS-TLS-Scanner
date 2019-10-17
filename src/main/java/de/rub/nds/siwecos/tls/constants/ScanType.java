@@ -17,11 +17,11 @@ package de.rub.nds.siwecos.tls.constants;
  */
 public enum ScanType {
     TLS,
-    SMTP,
-    SMTPS,
-    POP3,
-    POP3S,
-    IMAP,
-    IMAPS,
+    SMTP_TLS,
+    SMTPS_TLS,
+    POP3_TLS,
+    POP3S_TLS,
+    IMAP_TLS,
+    IMAPS_TLS,
     MAIL; // Scans all mail services at the same time
 }
