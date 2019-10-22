@@ -105,13 +105,6 @@ An example output may look like this:
     "scoreType" : "success",
     "testDetails" : null
   }, {
-    "name" : "CERTIFICATE_WEAK_SIGN_ALGO",
-    "hasError" : false,
-    "errorMessage" : null,
-    "score" : 100,
-    "scoreType" : "hidden",
-    "testDetails" : null
-  }, {
     "name" : "CIPHERSUITE_ANON",
     "hasError" : false,
     "errorMessage" : null,
@@ -266,7 +259,6 @@ An example output may look like this:
 | CERTIFICATE_WEAK_SIGN_ALGORITHM     | Checks if the server uses a weak signature algorithm for its certificate  |
 | CERTIFICATE_NOT_SENT_BY_SERVER      | Checks if the server did send a certificate at all                        |
 | CIPHERSUITE_ANON                    | Checks if the server has ANON ciphersuites enabled                       |
-| CIPHERSUITE_CBC                     | Checks if the server has CBC ciphersuites enabled for TLS 1.0            | 
 | CIPHERSUITE_EXPORT                  | Checks if the server has EXPORT ciphersuites enabled                     |
 | CIPHERSUITE_NULL                    | Checks if the server has NULL ciphersuites enabled                       |
 | CIPHERSUITE_RC4                     | Checks if the server has RC4 ciphersuites enabled                        |
@@ -283,7 +275,6 @@ An example output may look like this:
 | CRIME_VULNERABLE                    | Checks if the server is vulnerable to the CRIME attack                   |
 | SWEET32_VULNERABLE                  | Checks if the server is vulnerable to the SWEET32 attack                 |
 | HEARTBLEED_VULNERABLE               | Checks if the server is vulnerable to the Heartbleed attack              |
-| CVE20162107_VULNERABLE              | Checks if the server is vulnerable to CVE-2016-2107 	                 |
 | EARLYCCS_VULNERABLE				  | Checks if the server is vulnerable to the EarlyCCS attack				 |
 
 

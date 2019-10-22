@@ -156,25 +156,25 @@ public class TlsScannerCallback implements Runnable {
                 case TLS:
                     port = 443;
                     break;
-                case IMAP:
+                case IMAP_TLS:
                     starttlsDelegate.setStarttlsType(StarttlsType.IMAP);
                     port = 143;
                     break;
-                case IMAPS:
+                case IMAPS_TLS:
                     port = 993;
                     break;
-                case POP3:
+                case POP3_TLS:
                     starttlsDelegate.setStarttlsType(StarttlsType.POP3);
                     port = 110;
                     break;
-                case POP3S:
+                case POP3S_TLS:
                     port = 995;
                     break;
-                case SMTP:
+                case SMTP_TLS:
                     starttlsDelegate.setStarttlsType(StarttlsType.SMTP);
                     port = 25;
                     break;
-                case SMTPS:
+                case SMTPS_TLS:
                     port = 465;
                     break;
             }
