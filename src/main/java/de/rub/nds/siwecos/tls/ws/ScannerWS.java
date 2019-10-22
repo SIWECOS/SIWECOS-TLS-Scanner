@@ -74,6 +74,24 @@ public class ScannerWS {
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
+    
+    @POST
+    @Path("/smtp_msa")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response scanSmtpMsa(ScanRequest request) throws URISyntaxException {
+        LOGGER.info("Received a request to scan SMTP(MSA) of: " + request.getUrl());
+        if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
+            LOGGER.warn("No callback urls provided");
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
+        PoolManager
+                .getInstance()
+                .getService()
+                .submit(new TlsScannerCallback(request, SMTP_MSA_TLS, new DebugOutput(PoolManager.getInstance().getService()
+                        .getQueue().size(), System.currentTimeMillis())));
+        return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
 
     @POST
     @Path("/smtps")

@@ -174,6 +174,10 @@ public class TlsScannerCallback implements Runnable {
                     starttlsDelegate.setStarttlsType(StarttlsType.SMTP);
                     port = 25;
                     break;
+                case SMTP_MSA_TLS:
+                    starttlsDelegate.setStarttlsType(StarttlsType.SMTP);
+                    port = 587;
+                    break;
                 case SMTPS_TLS:
                     port = 465;
                     break;

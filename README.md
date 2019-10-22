@@ -33,6 +33,7 @@ http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/pop3s
 http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/imap
 http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/imaps
 http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/smtp
+http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/smtp_msa
 http://127.0.0.1:8080/WS-TLS-Scanner-3.0.0/smtps
 
 ```

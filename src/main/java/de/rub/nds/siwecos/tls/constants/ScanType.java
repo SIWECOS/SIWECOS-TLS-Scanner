@@ -18,6 +18,7 @@ package de.rub.nds.siwecos.tls.constants;
 public enum ScanType {
     TLS,
     SMTP_TLS,
+    SMTP_MSA_TLS,
     SMTPS_TLS,
     POP3_TLS,
     POP3S_TLS,
