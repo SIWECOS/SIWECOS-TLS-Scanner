@@ -461,7 +461,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getCertificateChain().getContainsExpired() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -489,7 +488,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getCertificateChain().getContainsNotYetValid() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -503,7 +501,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getCertificate() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -579,7 +576,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getSupportsAnonCiphers() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -612,7 +608,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getSupportsExportCiphers() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -637,7 +632,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getSupportsNullCiphers() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -662,7 +656,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getSupportsRc4Ciphers() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -675,7 +668,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getEnforcesCipherSuiteOrdering() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -688,7 +680,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getSupportsSsl2() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -701,7 +692,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getSupportsSsl3() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -714,7 +704,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getBleichenbacherVulnerable() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -727,7 +716,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getPaddingOracleVulnerable() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -740,7 +728,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getInvalidCurveVulnerable() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -753,7 +740,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getCve20162107Vulnerable() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -766,7 +752,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getInvalidCurveEphermaralVulnerable() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -779,7 +764,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getPoodleVulnerable() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -792,7 +776,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getTlsPoodleVulnerable() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -805,7 +788,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getCrimeVulnerable() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -818,7 +800,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getSweet32Vulnerable() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -831,7 +812,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getHeartbleedVulnerable() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -844,7 +824,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.supportsAnyTls13() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -870,7 +849,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getSupportsDesCiphers() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
@@ -883,7 +861,6 @@ public class TlsScannerCallback implements Runnable {
         boolean hasError = report.getEarlyCcsVulnerable() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
-            ;
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
