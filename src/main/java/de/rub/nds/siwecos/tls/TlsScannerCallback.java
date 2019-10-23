@@ -83,22 +83,22 @@ import org.bouncycastle.jce.provider.BouncyCastleProvider;
  * @author Robert Merget <robert.merget@rub.de>
  */
 public class TlsScannerCallback implements Runnable {
-
+    
     protected static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(TlsScannerCallback.class
             .getName());
-
+    
     private final ScanRequest request;
-
+    
     private final DebugOutput debugOutput;
-
+    
     private final ScanType type;
-
+    
     public TlsScannerCallback(ScanRequest request, ScanType type, DebugOutput debugOutput) {
         this.request = request;
         this.debugOutput = debugOutput;
         this.type = type;
     }
-
+    
     private String callbackUrlsToId(String[] urls) {
         StringBuilder builder = new StringBuilder();
         for (String s : urls) {
@@ -106,10 +106,10 @@ public class TlsScannerCallback implements Runnable {
         }
         return "" + Math.abs(builder.toString().hashCode());
     }
-
+    
     @Override
     public void run() {
-
+        
         Thread.currentThread().setName(Thread.currentThread().getName() + "-" + request.getUrl());
         Security.addProvider(new BouncyCastleProvider());
         debugOutput.setLeftQueueAt(System.currentTimeMillis());
@@ -140,9 +140,9 @@ public class TlsScannerCallback implements Runnable {
                         new ErrorTestInfo(E.getMessage())), 0, scanResultList));
             }
         }
-
+        
     }
-
+    
     public ScanResult getScanResult(ScanType type, String id, ScanRequest request) {
         try {
             ScannerConfig scannerConfig = new ScannerConfig(new GeneralDelegate());
@@ -151,7 +151,7 @@ public class TlsScannerCallback implements Runnable {
             scannerConfig.setNoProgressbar(true);
             int port = 443;
             StarttlsDelegate starttlsDelegate = (StarttlsDelegate) scannerConfig.getDelegate(StarttlsDelegate.class);
-
+            
             switch (type) {
                 case TLS:
                     port = 443;
@@ -182,11 +182,10 @@ public class TlsScannerCallback implements Runnable {
                     port = 465;
                     break;
             }
-
+            
             ClientDelegate delegate = (ClientDelegate) scannerConfig.getDelegate(ClientDelegate.class);
-            URI uri = new URI(request.getUrl());
-            delegate.setHost(uri.getHost() + ":" + port);
-            LOGGER.debug("Scanning: " + uri.getHost() + ":" + port + " for " + type);
+            delegate.setHost(request.getUrl() + ":" + port);
+            LOGGER.info("Scanning: " + delegate.getHost() + " for " + type);
             ParallelExecutor executor = new ParallelExecutor(PoolManager.getInstance().getParallelProbeThreads(), 3,
                     new NamedThreadFactory("" + id));
             List<TlsProbe> phaseOneList = new LinkedList<>();
@@ -234,8 +233,10 @@ public class TlsScannerCallback implements Runnable {
             if (DebugManager.getInstance().isDebugEnabled()) {
                 result.setDebugOutput(debugOutput);
             }
+            
             return result;
         } catch (Throwable T) {
+            
             LOGGER.error("Failed to scan:" + request.getUrl() + " for " + type, T);
             return new ScanResult(type.name(), true, new TranslateableMessage("REPORT_CONSTRUCTION", new ErrorTestInfo(
                     T.getMessage())), 0, new LinkedList<TestResult>());
@@ -243,7 +244,7 @@ public class TlsScannerCallback implements Runnable {
             Thread.currentThread().setName(Thread.currentThread().getName().replace("-" + request.getUrl(), ""));
         }
     }
-
+    
     public String scanResultToJson(ScanResult result) {
         ObjectMapper ow = new ObjectMapper();
         String json = "";
@@ -254,7 +255,7 @@ public class TlsScannerCallback implements Runnable {
         }
         return json;
     }
-
+    
     public String scanResultToJson(CollectedScanResult result) {
         ObjectMapper ow = new ObjectMapper();
         String json = "";
@@ -265,7 +266,7 @@ public class TlsScannerCallback implements Runnable {
         }
         return json;
     }
-
+    
     public void answer(ScanResult result) {
         String json = scanResultToJson(result);
         for (String callback : request.getCallbackurls()) {
@@ -292,7 +293,7 @@ public class TlsScannerCallback implements Runnable {
             }
         }
     }
-
+    
     public void answer(CollectedScanResult result) {
         String json = scanResultToJson(result);
         for (String callback : request.getCallbackurls()) {
@@ -318,7 +319,7 @@ public class TlsScannerCallback implements Runnable {
             }
         }
     }
-
+    
     public ScanResult reportToScanResult(SiteReport report, ScanType type) {
         if (!Objects.equals(report.getServerIsAlive(), Boolean.TRUE)) {
             if (type == ScanType.TLS) {
@@ -401,14 +402,14 @@ public class TlsScannerCallback implements Runnable {
                 max = result.getScore();
                 hasCritical = true;
             }
-
+            
             hasError |= result.isHasError();
             if (!hasError) {
                 score += result.getScore();
                 count++;
             }
         }
-
+        
         if (count != 0) {
             score = score / count;
         } else {
@@ -428,16 +429,16 @@ public class TlsScannerCallback implements Runnable {
         ScanResult result = new ScanResult(type.name(), false, null, score, resultList);
         return result;
     }
-
+    
     private TranslateableMessage getPortResponse(SiteReport report) {
         return new TranslateableMessage("PORT_NO_RESPONSE", new HostTestInfo(report.getHost()));
-
+        
     }
-
+    
     private TranslateableMessage getTlsSupported(SiteReport report) {
         return new TranslateableMessage("TLS_NOT_SUPPORTED", new HostTestInfo(report.getHost()));
     }
-
+    
     private TestResult getCertificateExpired(SiteReport report) {
         List<TranslateableMessage> messageList = new LinkedList<>();
         Date tempDate = null;
@@ -469,7 +470,7 @@ public class TlsScannerCallback implements Runnable {
                 !report.getCertificateChain().getContainsExpired() == Boolean.TRUE ? "success" : "critical",
                 messageList);
     }
-
+    
     private TestResult getCertificateNotValidYet(SiteReport report) {
         List<TranslateableMessage> messageList = new LinkedList<>();
         Date tempDate = null;
@@ -497,7 +498,7 @@ public class TlsScannerCallback implements Runnable {
                 !report.getCertificateChain().getContainsNotYetValid() == Boolean.TRUE ? "success" : "warning",
                 messageList);
     }
-
+    
     private TestResult getCertificateNotSentByServer(SiteReport report) {
         boolean hasError = report.getCertificate() == null;
         TranslateableMessage errorMessage = null;
@@ -506,14 +507,14 @@ public class TlsScannerCallback implements Runnable {
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
-
+        
         if (report.getCertificate() == null) {
             return new TestResult("CERTIFICATE_NOT_SENT_BY_SERVER", hasError, errorMessage, 0, "critical", null);
         }
         return new TestResult("CERTIFICATE_NOT_SENT_BY_SERVER", hasError, errorMessage, report.getCertificate()
                 .getLength() > 0 ? 100 : 0, report.getCertificate().getLength() > 0 ? "hidden" : "critical", null);
     }
-
+    
     private TestResult getCertificateWeakHashFunction(SiteReport report) {
         String hashAlgo = null;
         List<TranslateableMessage> messageList = new LinkedList<>();
@@ -523,11 +524,11 @@ public class TlsScannerCallback implements Runnable {
                         || certReport.getSignatureAndHashAlgorithm().getHashAlgorithm() == HashAlgorithm.SHA1) {
                     hashAlgo = certReport.getSignatureAndHashAlgorithm().getHashAlgorithm().name();
                     messageList.add(new TranslateableMessage("HASH_ALGO", new HashTestInfo(hashAlgo)));
-
+                    
                     break;
                 }
             }
-
+            
         }
         boolean critical = false;
         if (hashAlgo != null && hashAlgo.equals(HashAlgorithm.MD5.name())) {
@@ -550,18 +551,18 @@ public class TlsScannerCallback implements Runnable {
                     errorMessage,
                     report.getCertificateChain().getContainsWeakSignedNonTruststoresCertificates() ? 0 : 100,
                     !report.getCertificateChain().getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success"
-                            : "critical", messageList);
-
+                    : "critical", messageList);
+            
         } else {
-
+            
             return new TestResult("CERTIFICATE_WEAK_HASH_FUNCTION", report.getCertificateChain()
                     .getContainsWeakSignedNonTruststoresCertificates() == null, null, report.getCertificateChain()
-                    .getContainsWeakSignedNonTruststoresCertificates() ? 50 : 100, !report.getCertificateChain()
-                    .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "warning",
+                            .getContainsWeakSignedNonTruststoresCertificates() ? 50 : 100, !report.getCertificateChain()
+                            .getContainsWeakSignedNonTruststoresCertificates() == Boolean.TRUE ? "success" : "warning",
                     messageList);
         }
     }
-
+    
     private TestResult getSupportsAnon(SiteReport report) {
         List<TranslateableMessage> messageList = new LinkedList<>();
         List<CipherSuite> suiteList = new LinkedList<>();
@@ -586,7 +587,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getSupportsAnonCiphers(), Boolean.TRUE) ? 0 : 100, !(Objects.equals(
                 report.getSupportsAnonCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
     }
-
+    
     private TestInfo convertSuiteList(List<CipherSuite> suiteList) {
         StringBuilder builder = new StringBuilder();
         for (CipherSuite suite : suiteList) {
@@ -594,7 +595,7 @@ public class TlsScannerCallback implements Runnable {
         }
         return new CiphersuitesTestInfo(builder.toString());
     }
-
+    
     private TestResult getSupportsExport(SiteReport report) {
         List<TranslateableMessage> messageList = new LinkedList<>();
         List<CipherSuite> suiteList = new LinkedList<>();
@@ -619,7 +620,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getSupportsExportCiphers(), Boolean.TRUE) ? 0 : 100, !(Objects.equals(
                 report.getSupportsExportCiphers(), Boolean.TRUE)) ? "success" : "fatal", messageList);
     }
-
+    
     private TestResult getSupportsNull(SiteReport report) {
         List<TranslateableMessage> messageList = new LinkedList<>();
         List<CipherSuite> suiteList = new LinkedList<>();
@@ -644,7 +645,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getSupportsNullCiphers() == Boolean.TRUE ? 0 : 100,
                 !(report.getSupportsNullCiphers() == Boolean.TRUE) ? "success" : "fatal", messageList);
     }
-
+    
     private TestResult getSupportsRc4(SiteReport report) {
         List<TranslateableMessage> messageList = new LinkedList<>();
         List<CipherSuite> suiteList = new LinkedList<>();
@@ -669,7 +670,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getSupportsRc4Ciphers() == Boolean.TRUE ? 30 : 100,
                 !(report.getSupportsRc4Ciphers() == Boolean.TRUE) ? "success" : "warning", messageList);
     }
-
+    
     private TestResult getCipherSuiteOrder(SiteReport report) {
         boolean hasError = report.getEnforcesCipherSuiteOrdering() == null;
         TranslateableMessage errorMessage = null;
@@ -682,7 +683,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getEnforcesCipherSuiteOrdering() == Boolean.TRUE ? 100 : 90,
                 (report.getEnforcesCipherSuiteOrdering() == Boolean.TRUE) ? "success" : "warning", null);
     }
-
+    
     private TestResult getSupportsSsl2(SiteReport report) {
         boolean hasError = report.getSupportsSsl2() == null;
         TranslateableMessage errorMessage = null;
@@ -695,7 +696,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getSupportsSsl2() == Boolean.TRUE ? 0 : 100,
                 !(report.getSupportsSsl3() == Boolean.TRUE) ? "success" : "fatal", null);
     }
-
+    
     private TestResult getSupportsSsl3(SiteReport report) {
         boolean hasError = report.getSupportsSsl3() == null;
         TranslateableMessage errorMessage = null;
@@ -708,7 +709,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getSupportsSsl3() == Boolean.TRUE ? 0 : 100,
                 !(report.getSupportsSsl3() == Boolean.TRUE) ? "success" : "critical", null);
     }
-
+    
     private TestResult getBleichenbacherVulnerable(SiteReport report) {
         boolean hasError = report.getBleichenbacherVulnerable() == null;
         TranslateableMessage errorMessage = null;
@@ -721,7 +722,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getBleichenbacherVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getBleichenbacherVulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
-
+    
     private TestResult getPaddingOracleVulnerable(SiteReport report) {
         boolean hasError = report.getPaddingOracleVulnerable() == null;
         TranslateableMessage errorMessage = null;
@@ -734,7 +735,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getPaddingOracleVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getPaddingOracleVulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
-
+    
     private TestResult getInvalidCurveVulnerable(SiteReport report) {
         boolean hasError = report.getInvalidCurveVulnerable() == null;
         TranslateableMessage errorMessage = null;
@@ -747,7 +748,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getInvalidCurveVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getInvalidCurveVulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
-
+    
     private TestResult getCve20162107Vulnerable(SiteReport report) {
         boolean hasError = report.getCve20162107Vulnerable() == null;
         TranslateableMessage errorMessage = null;
@@ -760,7 +761,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getCve20162107Vulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getCve20162107Vulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
-
+    
     private TestResult getInvalidCurveEphemeralVulnerable(SiteReport report) {
         boolean hasError = report.getInvalidCurveEphermaralVulnerable() == null;
         TranslateableMessage errorMessage = null;
@@ -773,7 +774,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getInvalidCurveEphermaralVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getInvalidCurveEphermaralVulnerable() == Boolean.TRUE) ? "success" : "warning", null);
     }
-
+    
     private TestResult getPoodleVulnerable(SiteReport report) {
         boolean hasError = report.getPoodleVulnerable() == null;
         TranslateableMessage errorMessage = null;
@@ -786,7 +787,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getPoodleVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getPoodleVulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
-
+    
     private TestResult getTlsPoodleVulnerable(SiteReport report) {
         boolean hasError = report.getTlsPoodleVulnerable() == null;
         TranslateableMessage errorMessage = null;
@@ -799,7 +800,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getTlsPoodleVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getTlsPoodleVulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
-
+    
     private TestResult getCrimeVulnerable(SiteReport report) {
         boolean hasError = report.getCrimeVulnerable() == null;
         TranslateableMessage errorMessage = null;
@@ -812,7 +813,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getCrimeVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getCrimeVulnerable() == Boolean.TRUE) ? "success" : "critical", null);
     }
-
+    
     private TestResult getSweet32Vulnerable(SiteReport report) {
         boolean hasError = report.getSweet32Vulnerable() == null;
         TranslateableMessage errorMessage = null;
@@ -825,7 +826,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getSweet32Vulnerable() == Boolean.TRUE ? 80 : 100,
                 !(report.getSweet32Vulnerable() == Boolean.TRUE) ? "success" : "warning", null);
     }
-
+    
     private TestResult getHeartbleedVulnerable(SiteReport report) {
         boolean hasError = report.getHeartbleedVulnerable() == null;
         TranslateableMessage errorMessage = null;
@@ -838,7 +839,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getHeartbleedVulnerable() == Boolean.TRUE ? 0 : 100,
                 !(report.getHeartbleedVulnerable() == Boolean.TRUE) ? "success" : "fatal", null);
     }
-
+    
     private TestResult getSupportsTls13(SiteReport report) {
         boolean hasError = report.supportsAnyTls13() == null;
         TranslateableMessage errorMessage = null;
@@ -851,7 +852,7 @@ public class TlsScannerCallback implements Runnable {
                 report.supportsAnyTls13() == Boolean.TRUE ? 100 : 0,
                 report.supportsAnyTls13() == Boolean.TRUE ? "bonus" : "hidden", null);
     }
-
+    
     private TestResult getSupportsDes(SiteReport report) {
         List<CipherSuite> suiteList = new LinkedList<>();
         for (CipherSuite suite : report.getCipherSuites()) {
@@ -865,7 +866,7 @@ public class TlsScannerCallback implements Runnable {
         } else {
             messageList = null;
         }
-
+        
         boolean hasError = report.getSupportsDesCiphers() == null;
         TranslateableMessage errorMessage = null;
         if (hasError == Boolean.TRUE)
@@ -877,7 +878,7 @@ public class TlsScannerCallback implements Runnable {
                 report.getSupportsDesCiphers() == Boolean.TRUE ? 0 : 100,
                 !(report.getSupportsDesCiphers() == Boolean.TRUE) ? "success" : "warning", messageList);
     }
-
+    
     private TestResult getEarlyCcsVulnerable(SiteReport report) {
         boolean hasError = report.getEarlyCcsVulnerable() == null;
         TranslateableMessage errorMessage = null;
@@ -886,7 +887,7 @@ public class TlsScannerCallback implements Runnable {
         {
             errorMessage = new TranslateableMessage("ERROR_GENERIC", null);
         }
-
+        
         return new TestResult(
                 "EARLYCCS_VULNERABLE",
                 hasError,
