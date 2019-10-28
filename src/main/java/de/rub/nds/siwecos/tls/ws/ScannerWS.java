@@ -44,6 +44,11 @@ public class ScannerWS {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response scanHttps(ScanRequest request) throws URISyntaxException {
         LOGGER.info("Received a request to scan HTTPS of: " + request.getUrl());
+        if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
+            LOGGER.warn("No callback urls provided");
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
         PoolManager
                 .getInstance()
                 .getService()
@@ -57,10 +62,33 @@ public class ScannerWS {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response scanSmtp(ScanRequest request) throws URISyntaxException {
         LOGGER.info("Received a request to scan SMTP(STARTTLS) of: " + request.getUrl());
+        if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
+            LOGGER.warn("No callback urls provided");
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, SMTP, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, SMTP_TLS, new DebugOutput(PoolManager.getInstance().getService()
+                        .getQueue().size(), System.currentTimeMillis())));
+        return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
+    }
+    
+    @POST
+    @Path("/smtp_msa")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response scanSmtpMsa(ScanRequest request) throws URISyntaxException {
+        LOGGER.info("Received a request to scan SMTP(MSA) of: " + request.getUrl());
+        if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
+            LOGGER.warn("No callback urls provided");
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
+        PoolManager
+                .getInstance()
+                .getService()
+                .submit(new TlsScannerCallback(request, SMTP_MSA_TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -70,10 +98,15 @@ public class ScannerWS {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response scanSmtps(ScanRequest request) throws URISyntaxException {
         LOGGER.info("Received a request to scan SMTP of: " + request.getUrl());
+        if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
+            LOGGER.warn("No callback urls provided");
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, SMTPS, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, SMTPS_TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -83,10 +116,15 @@ public class ScannerWS {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response scanPop3(ScanRequest request) throws URISyntaxException {
         LOGGER.info("Received a request to scan POP3(STARTTLS) of: " + request.getUrl());
+        if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
+            LOGGER.warn("No callback urls provided");
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, POP3, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, POP3_TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -96,10 +134,15 @@ public class ScannerWS {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response scanPop3s(ScanRequest request) throws URISyntaxException {
         LOGGER.info("Received a request to scan POP3S of: " + request.getUrl());
+        if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
+            LOGGER.warn("No callback urls provided");
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, POP3S, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, POP3S_TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -109,10 +152,15 @@ public class ScannerWS {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response scanImap(ScanRequest request) throws URISyntaxException {
         LOGGER.info("Received a request to scan IMAP(STARTTLS): " + request.getUrl());
+        if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
+            LOGGER.warn("No callback urls provided");
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, IMAP, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, IMAP_TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -122,10 +170,15 @@ public class ScannerWS {
     @Consumes(MediaType.APPLICATION_JSON)
     public Response scanImaps(ScanRequest request) throws URISyntaxException {
         LOGGER.info("Received a request to scan IMAPS: " + request.getUrl());
+        if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
+            LOGGER.warn("No callback urls provided");
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, IMAPS, new DebugOutput(PoolManager.getInstance().getService()
+                .submit(new TlsScannerCallback(request, IMAPS_TLS, new DebugOutput(PoolManager.getInstance().getService()
                         .getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
@@ -134,7 +187,12 @@ public class ScannerWS {
     @Path("/mail")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response scanMail(ScanRequest request) throws URISyntaxException {
-        LOGGER.info("Received a request to scan IMAPS: " + request.getUrl());
+        LOGGER.info("Received a request to scan Mail: " + request.getUrl());
+        if (request.getCallbackurls() == null || request.getCallbackurls().length == 0) {
+            LOGGER.warn("No callback urls provided");
+            return Response.status(Response.Status.BAD_REQUEST).entity("No callback urls provided")
+                    .type(MediaType.TEXT_PLAIN_TYPE).build();
+        }
         PoolManager
                 .getInstance()
                 .getService()
