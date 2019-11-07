@@ -70,11 +70,11 @@ public class ScannerWS {
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, SMTP_TLS, new DebugOutput(PoolManager.getInstance().getService()
-                        .getQueue().size(), System.currentTimeMillis())));
+                .submit(new TlsScannerCallback(request, SMTP_TLS, new DebugOutput(PoolManager.getInstance()
+                        .getService().getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
-    
+
     @POST
     @Path("/smtp_msa")
     @Consumes(MediaType.APPLICATION_JSON)
@@ -88,8 +88,8 @@ public class ScannerWS {
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, SMTP_MSA_TLS, new DebugOutput(PoolManager.getInstance().getService()
-                        .getQueue().size(), System.currentTimeMillis())));
+                .submit(new TlsScannerCallback(request, SMTP_MSA_TLS, new DebugOutput(PoolManager.getInstance()
+                        .getService().getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
@@ -106,8 +106,8 @@ public class ScannerWS {
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, SMTPS_TLS, new DebugOutput(PoolManager.getInstance().getService()
-                        .getQueue().size(), System.currentTimeMillis())));
+                .submit(new TlsScannerCallback(request, SMTPS_TLS, new DebugOutput(PoolManager.getInstance()
+                        .getService().getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
@@ -124,8 +124,8 @@ public class ScannerWS {
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, POP3_TLS, new DebugOutput(PoolManager.getInstance().getService()
-                        .getQueue().size(), System.currentTimeMillis())));
+                .submit(new TlsScannerCallback(request, POP3_TLS, new DebugOutput(PoolManager.getInstance()
+                        .getService().getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
@@ -142,8 +142,8 @@ public class ScannerWS {
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, POP3S_TLS, new DebugOutput(PoolManager.getInstance().getService()
-                        .getQueue().size(), System.currentTimeMillis())));
+                .submit(new TlsScannerCallback(request, POP3S_TLS, new DebugOutput(PoolManager.getInstance()
+                        .getService().getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
@@ -160,8 +160,8 @@ public class ScannerWS {
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, IMAP_TLS, new DebugOutput(PoolManager.getInstance().getService()
-                        .getQueue().size(), System.currentTimeMillis())));
+                .submit(new TlsScannerCallback(request, IMAP_TLS, new DebugOutput(PoolManager.getInstance()
+                        .getService().getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
@@ -178,8 +178,8 @@ public class ScannerWS {
         PoolManager
                 .getInstance()
                 .getService()
-                .submit(new TlsScannerCallback(request, IMAPS_TLS, new DebugOutput(PoolManager.getInstance().getService()
-                        .getQueue().size(), System.currentTimeMillis())));
+                .submit(new TlsScannerCallback(request, IMAPS_TLS, new DebugOutput(PoolManager.getInstance()
+                        .getService().getQueue().size(), System.currentTimeMillis())));
         return Response.status(Response.Status.OK).entity("Success").type(MediaType.TEXT_PLAIN_TYPE).build();
     }
 
