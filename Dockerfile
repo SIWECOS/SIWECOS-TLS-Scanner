@@ -13,7 +13,7 @@ COPY license_header_plain.txt /src/WS-TLS-Scanner
 WORKDIR /src
 
 RUN git clone --branch 3.2 https://github.com/RUB-NDS/TLS-Attacker.git \
-    && git clone --recursive --branch 2.11 https://github.com/RUB-NDS/TLS-Scanner.git
+    && git clone --recursive --branch 2.11.1 https://github.com/RUB-NDS/TLS-Scanner.git
 
 RUN cd /src/TLS-Attacker && mvn clean install -DskipTests=true \
     && cd /src/TLS-Scanner && mvn clean install -DskipTests=true 
